@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronicle - Souvenez-vous pour toujours</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .intro-container { position: relative; z-index: 10; text-align: center; padding: 40px; opacity: 0; animation: fadeIn 1s ease 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .app-name { font-size: 64px; font-weight: 800; background: linear-gradient(135deg, #D4AF37, #FFD700, #E8C574); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 6px; margin-bottom: 20px; }
+        .tagline { font-size: 20px; color: #E8C574; letter-spacing: 3px; margin-bottom: 60px; }
+        .halo-button { width: 280px; height: 280px; margin: 0 auto; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.3), transparent); border: 2px solid rgba(212, 175, 55, 0.4); box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.5s ease; animation: pulse 3s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); } 50% { transform: scale(1.02); box-shadow: 0 0 90px rgba(212, 175, 55, 0.9); } }
+        .halo-button:hover { transform: scale(1.08); box-shadow: 0 0 100px rgba(212, 175, 55, 1); }
+        .chronicle-icon { font-size: 64px; margin-bottom: 15px; }
+        .cta-text { color: #F5F5F0; font-size: 15px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+        @media (max-width: 768px) { .app-name { font-size: 48px; } .halo-button { width: 220px; height: 220px; } }
+    </style>
+</head>
+<body>
+    <div class="atmospheric-bg"></div>
+    <div class="stars-layer" id="starsLayer"></div>
+    
+    <div class="intro-container">
+        <h1 class="app-name">CHRONICLE</h1>
+        <p class="tagline">Souvenez-vous pour toujours</p>
+        
+        <div class="halo-button" onclick="window.location.href='cercles.html'">
+            <span class="chronicle-icon">⏱️</span>
+            <p class="cta-text">Entrez dans vos souvenirs</p>
+        </div>
+    </div>
+
+    <script>
+        function createStars() {
+            const layer = document.getElementById('starsLayer');
+            const count = window.innerWidth < 768 ? 40 : 60;
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                const size = 1 + Math.random() * 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                layer.appendChild(star);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', createStars);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = 'cercles.html';
+            }
+        });
+    </script>
+</body>
+</html>
