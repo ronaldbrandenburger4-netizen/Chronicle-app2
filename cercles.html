@@ -81,6 +81,10 @@
             0%, 100% { box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); }
             50% { box-shadow: 0 0 90px rgba(212, 175, 55, 0.9); }
         }
+        .circle-halo.new-circle {
+            border-style: dashed;
+            opacity: 0.7;
+        }
         .circle-icon { font-size: 64px; margin-bottom: 12px; }
         .circle-name { font-size: 18px; font-weight: 700; text-transform: uppercase; }
         .member-orbit {
@@ -88,7 +92,9 @@
             width: 80px;
             height: 80px;
             cursor: pointer;
+            transition: all 0.3s;
         }
+        .member-orbit:hover { transform: scale(1.1); }
         .member-avatar {
             width: 100%;
             height: 100%;
@@ -100,11 +106,27 @@
             justify-content: center;
             font-size: 36px;
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+        .add-member-btn {
+            position: absolute;
+            top: -25px;
+            right: -25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
             transition: all 0.3s;
         }
-        .member-orbit:hover .member-avatar {
-            transform: scale(1.2);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+        .add-member-btn:hover {
+            transform: scale(1.15) rotate(90deg);
         }
         .reset-btn {
             position: fixed;
@@ -120,6 +142,96 @@
             box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
             z-index: 1000;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.visible { display: flex; }
+        .modal-content {
+            background: #1a2d47;
+            border: 2px solid #D4AF37;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal-title {
+            color: #D4AF37;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .emoji-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(26, 45, 71, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+        }
+        .emoji-btn.selected {
+            border-color: #D4AF37;
+            transform: scale(1.1);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            color: #E8C574;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(13, 20, 37, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            color: #F5F5F0;
+            font-size: 16px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-cancel {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #F5F5F0;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #D4AF37, #E8C574);
+            color: #0a0e1a;
+        }
     </style>
 </head>
 <body>
@@ -134,48 +246,55 @@
     
     <button class="reset-btn" onclick="resetApp()">🔄 RESET</button>
 
+    <!-- Modal Nouveau Cercle -->
+    <div class="modal" id="circleModal">
+        <div class="modal-content">
+            <h2 class="modal-title">➕ Nouveau Cercle</h2>
+            <div class="emoji-grid" id="circleEmojiGrid"></div>
+            <div class="input-group">
+                <label>Nom du cercle</label>
+                <input type="text" id="circleName" placeholder="Ex: Famille, Amis, Travail...">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-cancel" onclick="closeCircleModal()">Annuler</button>
+                <button class="btn btn-save" onclick="saveCircle()">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter Membre -->
+    <div class="modal" id="memberModal">
+        <div class="modal-content">
+            <h2 class="modal-title">👤 Ajouter un Membre</h2>
+            <div class="emoji-grid" id="memberEmojiGrid"></div>
+            <div class="input-group">
+                <label>Nom du membre</label>
+                <input type="text" id="memberName" placeholder="Ex: Papa, Maman, Paul...">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-cancel" onclick="closeMemberModal()">Annuler</button>
+                <button class="btn btn-save" onclick="saveMember()">Ajouter</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // STORAGE SIMPLIFIÉ
         const STORAGE_KEY = 'chronicle_data';
-        
+        const CIRCLE_EMOJIS = ['👨‍👩‍👧‍👦', '🎉', '💼', '🏠', '✈️', '🎓', '❤️', '🎮'];
+        const MEMBER_EMOJIS = ['👤', '👨', '👩', '👦', '👧', '👴', '👵', '🧑'];
+        let selectedCircleEmoji = '👨‍👩‍👧‍👦';
+        let selectedMemberEmoji = '👤';
+        let currentCircleId = null;
+
         function getData() {
             const data = localStorage.getItem(STORAGE_KEY);
             return data ? JSON.parse(data) : { circles: [], members: [], events: [], memories: [] };
         }
-        
+
         function saveData(data) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
-        
-        function addCircle(name, icon) {
-            const data = getData();
-            const circle = {
-                id: 'circle_' + Date.now(),
-                name: name,
-                icon: icon,
-                memberCount: 0
-            };
-            data.circles.push(circle);
-            saveData(data);
-            return circle;
-        }
-        
-        function addMember(circleId, name, avatar) {
-            const data = getData();
-            const member = {
-                id: 'member_' + Date.now(),
-                circleId: circleId,
-                name: name,
-                avatar: avatar,
-                isAdmin: true
-            };
-            data.members.push(member);
-            const circle = data.circles.find(c => c.id === circleId);
-            if (circle) circle.memberCount++;
-            saveData(data);
-            return member;
-        }
-        
+
         function resetApp() {
             if (confirm('⚠️ SUPPRIMER TOUTES LES DONNÉES ?')) {
                 localStorage.clear();
@@ -183,64 +302,183 @@
                 location.reload();
             }
         }
-        
+
+        function showCircleModal() {
+            document.getElementById('circleModal').classList.add('visible');
+            renderCircleEmojis();
+        }
+
+        function closeCircleModal() {
+            document.getElementById('circleModal').classList.remove('visible');
+            document.getElementById('circleName').value = '';
+        }
+
+        function renderCircleEmojis() {
+            const grid = document.getElementById('circleEmojiGrid');
+            grid.innerHTML = '';
+            CIRCLE_EMOJIS.forEach(emoji => {
+                const btn = document.createElement('div');
+                btn.className = 'emoji-btn';
+                btn.textContent = emoji;
+                btn.onclick = () => {
+                    document.querySelectorAll('#circleEmojiGrid .emoji-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedCircleEmoji = emoji;
+                };
+                if (emoji === selectedCircleEmoji) btn.classList.add('selected');
+                grid.appendChild(btn);
+            });
+        }
+
+        function saveCircle() {
+            const name = document.getElementById('circleName').value.trim();
+            if (!name) {
+                alert('⚠️ Donnez un nom au cercle !');
+                return;
+            }
+
+            const data = getData();
+            data.circles.push({
+                id: 'circle_' + Date.now(),
+                name: name,
+                icon: selectedCircleEmoji,
+                memberCount: 0
+            });
+            saveData(data);
+            closeCircleModal();
+            render();
+        }
+
+        function showMemberModal(circleId) {
+            currentCircleId = circleId;
+            document.getElementById('memberModal').classList.add('visible');
+            renderMemberEmojis();
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('visible');
+            document.getElementById('memberName').value = '';
+            currentCircleId = null;
+        }
+
+        function renderMemberEmojis() {
+            const grid = document.getElementById('memberEmojiGrid');
+            grid.innerHTML = '';
+            MEMBER_EMOJIS.forEach(emoji => {
+                const btn = document.createElement('div');
+                btn.className = 'emoji-btn';
+                btn.textContent = emoji;
+                btn.onclick = () => {
+                    document.querySelectorAll('#memberEmojiGrid .emoji-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedMemberEmoji = emoji;
+                };
+                if (emoji === selectedMemberEmoji) btn.classList.add('selected');
+                grid.appendChild(btn);
+            });
+        }
+
+        function saveMember() {
+            const name = document.getElementById('memberName').value.trim();
+            if (!name) {
+                alert('⚠️ Donnez un nom au membre !');
+                return;
+            }
+
+            const data = getData();
+            data.members.push({
+                id: 'member_' + Date.now(),
+                circleId: currentCircleId,
+                name: name,
+                avatar: selectedMemberEmoji,
+                isAdmin: false
+            });
+            const circle = data.circles.find(c => c.id === currentCircleId);
+            if (circle) circle.memberCount++;
+            saveData(data);
+            closeMemberModal();
+            render();
+        }
+
         function render() {
             const container = document.getElementById('circlesContainer');
             container.innerHTML = '';
             const data = getData();
-            
-            console.log('📊 Données:', data);
-            
-            // Si vide, créer cercle par défaut
+
             if (data.circles.length === 0) {
-                console.log('➕ Création cercle Famille');
-                const family = addCircle('Famille', '👨‍👩‍👧‍👦');
-                addMember(family.id, 'Moi', '👤');
-                location.reload();
-                return;
+                const family = {
+                    id: 'circle_' + Date.now(),
+                    name: 'Famille',
+                    icon: '👨‍👩‍👧‍👦',
+                    memberCount: 1
+                };
+                data.circles.push(family);
+                data.members.push({
+                    id: 'member_' + Date.now(),
+                    circleId: family.id,
+                    name: 'Moi',
+                    avatar: '👤',
+                    isAdmin: true
+                });
+                saveData(data);
             }
-            
-            // Afficher les cercles
+
             data.circles.forEach(circle => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'circle-wrapper';
-                
-                wrapper.innerHTML = `
-                    <div class="circle-halo">
-                        <div class="circle-icon">${circle.icon}</div>
-                        <div class="circle-name">${circle.name}</div>
-                    </div>
+
+                const halo = document.createElement('div');
+                halo.className = 'circle-halo';
+                halo.innerHTML = `
+                    <div class="circle-icon">${circle.icon}</div>
+                    <div class="circle-name">${circle.name}</div>
                 `;
-                
-                // Afficher les membres en orbite
+                wrapper.appendChild(halo);
+
                 const members = data.members.filter(m => m.circleId === circle.id);
                 const radius = 150;
-                
+
                 members.forEach((member, i) => {
                     const angle = (360 / Math.max(members.length, 4)) * i;
                     const radian = (angle - 90) * (Math.PI / 180);
                     const x = radius * Math.cos(radian);
                     const y = radius * Math.sin(radian);
-                    
+
                     const memberDiv = document.createElement('div');
                     memberDiv.className = 'member-orbit';
                     memberDiv.style.left = `calc(50% + ${x}px - 40px)`;
                     memberDiv.style.top = `calc(50% + ${y}px - 40px)`;
                     memberDiv.onclick = () => window.location.href = `timeline.html?memberId=${member.id}`;
                     memberDiv.innerHTML = `<div class="member-avatar">${member.avatar}</div>`;
-                    
+
                     wrapper.appendChild(memberDiv);
                 });
-                
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'add-member-btn';
+                addBtn.textContent = '+';
+                addBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    showMemberModal(circle.id);
+                };
+                wrapper.appendChild(addBtn);
+
                 container.appendChild(wrapper);
             });
+
+            // Bouton nouveau cercle
+            const newWrapper = document.createElement('div');
+            newWrapper.className = 'circle-wrapper';
+            newWrapper.innerHTML = `
+                <div class="circle-halo new-circle" onclick="showCircleModal()">
+                    <div class="circle-icon">➕</div>
+                    <div class="circle-name">Nouveau Cercle</div>
+                </div>
+            `;
+            container.appendChild(newWrapper);
         }
-        
-        // DÉMARRAGE
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('✅ Page chargée');
-            render();
-        });
+
+        document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
 </html>
