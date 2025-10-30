@@ -3,59 +3,758 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronicle - Souvenez-vous pour toujours</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Chronicle - Intro</title>
     <style>
-        body { height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .intro-container { position: relative; z-index: 10; text-align: center; padding: 40px; opacity: 0; animation: fadeIn 1s ease 0.3s forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        .app-name { font-size: 64px; font-weight: 800; background: linear-gradient(135deg, #D4AF37, #FFD700, #E8C574); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 6px; margin-bottom: 20px; }
-        .tagline { font-size: 20px; color: #E8C574; letter-spacing: 3px; margin-bottom: 60px; }
-        .halo-button { width: 280px; height: 280px; margin: 0 auto; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.3), transparent); border: 2px solid rgba(212, 175, 55, 0.4); box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.5s ease; animation: pulse 3s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); } 50% { transform: scale(1.02); box-shadow: 0 0 90px rgba(212, 175, 55, 0.9); } }
-        .halo-button:hover { transform: scale(1.08); box-shadow: 0 0 100px rgba(212, 175, 55, 1); }
-        .chronicle-icon { font-size: 64px; margin-bottom: 15px; }
-        .cta-text { color: #F5F5F0; font-size: 15px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-        @media (max-width: 768px) { .app-name { font-size: 48px; } .halo-button { width: 220px; height: 220px; } }
+        :root {
+            --gold-primary: #D4AF37;
+            --gold-light: #E8C574;
+            --gold-glow: rgba(212, 175, 55, 0.6);
+            --space-dark: #0a0e1a;
+            --space-medium: #1a2d47;
+            --space-light: #2d4a6e;
+            --text-primary: #F5F5F0;
+            --glow-intense: 0 0 40px rgba(212, 175, 55, 0.8);
+            --shadow-deep: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, var(--space-dark) 0%, var(--space-medium) 50%, var(--space-light) 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .atmospheric-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(45, 74, 110, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(26, 45, 71, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(13, 20, 37, 0.5) 0%, transparent 100%),
+                linear-gradient(180deg, #0a0e1a 0%, #1a2d47 50%, #2d4a6e 100%);
+            animation: atmosphere-shift 20s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes atmosphere-shift {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.05) rotate(1deg);
+                opacity: 0.95;
+            }
+        }
+
+        .stars-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translateY(-30px) translateX(20px);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(-50px) translateX(-10px);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translateY(-20px) translateX(-30px);
+                opacity: 0.9;
+            }
+        }
+
+        .intro-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px;
+            opacity: 0;
+            animation: fade-in 1s ease-out 0.3s forwards;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: logo-entrance 1.5s ease-out 0.5s forwards;
+        }
+
+        @keyframes logo-entrance {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(5px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .app-name {
+            font-size: 72px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 25%, #E8C574 50%, #FFD700 75%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 300% auto;
+            animation: shimmer 4s ease-in-out infinite;
+            letter-spacing: 6px;
+            text-shadow: 0 0 60px rgba(212, 175, 55, 0.4);
+            filter: drop-shadow(0 4px 15px rgba(212, 175, 55, 0.3));
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .tagline {
+            font-size: 20px;
+            color: var(--gold-light);
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .halo-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5) rotate(-180deg);
+            animation: halo-entrance 1.8s ease-out 1s forwards;
+        }
+
+        @keyframes halo-entrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(-180deg);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.08) rotate(10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .neural-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .neural-connection {
+            stroke: var(--gold-light);
+            stroke-width: 1;
+            opacity: 0;
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: draw-connection 3s ease-in-out infinite;
+        }
+
+        @keyframes draw-connection {
+            0% {
+                stroke-dashoffset: 300;
+                opacity: 0.1;
+            }
+            50% {
+                stroke-dashoffset: 0;
+                opacity: 0.5;
+            }
+            100% {
+                stroke-dashoffset: -300;
+                opacity: 0.1;
+            }
+        }
+
+        .halo-button {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(212, 175, 55, 0.3) 0%,
+                rgba(255, 215, 0, 0.2) 30%,
+                rgba(212, 175, 55, 0.15) 60%,
+                transparent 100%
+            );
+            box-shadow: 
+                0 0 60px var(--gold-glow),
+                0 0 100px rgba(232, 197, 116, 0.4),
+                inset 0 0 40px rgba(255, 215, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: halo-pulse 3s ease-in-out infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+        }
+
+        @keyframes halo-pulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 60px var(--gold-glow),
+                    0 0 100px rgba(232, 197, 116, 0.4),
+                    inset 0 0 40px rgba(255, 215, 0, 0.2);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 90px rgba(212, 175, 55, 0.9),
+                    0 0 140px rgba(232, 197, 116, 0.6),
+                    inset 0 0 60px rgba(255, 215, 0, 0.3);
+                transform: scale(1.02);
+            }
+        }
+
+        .halo-button:hover {
+            transform: scale(1.08);
+            box-shadow: 
+                0 0 100px rgba(212, 175, 55, 1),
+                0 0 160px rgba(232, 197, 116, 0.8),
+                inset 0 0 80px rgba(255, 215, 0, 0.4);
+            border-color: var(--gold-primary);
+        }
+
+        .halo-button:active {
+            transform: scale(0.98);
+        }
+
+        .secondary-ring {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            animation: ring-rotate 12s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes ring-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .tertiary-ring {
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            animation: ring-rotate-reverse 18s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes ring-rotate-reverse {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+
+        .halo-core {
+            text-align: center;
+            z-index: 3;
+        }
+
+        .chronicle-icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.5));
+            animation: icon-float 3s ease-in-out infinite;
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .cta-text {
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .memory-node {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            background: rgba(26, 45, 71, 0.95);
+            border: 2px solid var(--gold-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(212, 175, 55, 0.3);
+            z-index: 4;
+            animation: orbit 20s linear infinite;
+            transform-origin: center;
+            transition: all 0.3s ease;
+        }
+
+        .memory-node:hover {
+            transform: scale(1.2);
+            box-shadow: 
+                0 6px 20px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .memory-node:nth-child(1) { animation-delay: 0s; }
+        .memory-node:nth-child(2) { animation-delay: -3.33s; }
+        .memory-node:nth-child(3) { animation-delay: -6.66s; }
+        .memory-node:nth-child(4) { animation-delay: -10s; }
+        .memory-node:nth-child(5) { animation-delay: -13.33s; }
+        .memory-node:nth-child(6) { animation-delay: -16.66s; }
+
+        @keyframes orbit {
+            from {
+                transform: rotate(0deg) translateX(180px) rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg) translateX(180px) rotate(-360deg);
+            }
+        }
+
+        .explosion-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #FFD700 0%, #E8C574 50%, #D4AF37 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 15px rgba(255, 215, 0, 1),
+                0 0 30px rgba(232, 197, 116, 0.8);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes explode-particle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .star-trail {
+            position: absolute;
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--gold-primary), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99;
+            animation: trail-fade 0.8s ease-out forwards;
+        }
+
+        @keyframes trail-fade {
+            from {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+            to {
+                opacity: 0;
+                transform: scaleY(0);
+            }
+        }
+
+        .intro-container.exploding .halo-button {
+            animation: explode-halo 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes explode-halo {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(6);
+                opacity: 0;
+            }
+        }
+
+        .intro-container.transforming {
+            animation: fade-out-intro 0.8s ease-out forwards;
+        }
+
+        @keyframes fade-out-intro {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .skip-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            background: rgba(26, 45, 71, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 25px;
+            color: var(--gold-light);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            opacity: 0;
+            animation: fade-in 0.5s ease-out 2s forwards;
+        }
+
+        .skip-button:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .app-name {
+                font-size: 48px;
+            }
+
+            .tagline {
+                font-size: 16px;
+            }
+
+            .halo-container {
+                width: 350px;
+                height: 350px;
+            }
+
+            .halo-button {
+                width: 220px;
+                height: 220px;
+            }
+
+            .chronicle-icon {
+                font-size: 48px;
+            }
+
+            .cta-text {
+                font-size: 13px;
+            }
+
+            .memory-node {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+
+            @keyframes orbit {
+                from {
+                    transform: rotate(0deg) translateX(140px) rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg) translateX(140px) rotate(-360deg);
+                }
+            }
+        }
     </style>
 </head>
 <body>
     <div class="atmospheric-bg"></div>
     <div class="stars-layer" id="starsLayer"></div>
-    
-    <div class="intro-container">
-        <h1 class="app-name">CHRONICLE</h1>
-        <p class="tagline">Souvenez-vous pour toujours</p>
-        
-        <div class="halo-button" onclick="window.location.href='cercles.html'">
-            <span class="chronicle-icon">⏱️</span>
-            <p class="cta-text">Entrez dans vos souvenirs</p>
+    <div class="particles-bg" id="particlesBg"></div>
+
+    <div class="intro-container" id="introContainer">
+        <div class="logo-section">
+            <h1 class="app-name">CHRONICLE</h1>
+            <p class="tagline">Souvenez-vous pour toujours</p>
+        </div>
+
+        <div class="halo-container" id="haloContainer">
+            <svg class="neural-canvas" id="neuralCanvas" viewBox="0 0 450 450"></svg>
+            <div class="secondary-ring"></div>
+            <div class="tertiary-ring"></div>
+
+            <div class="halo-button" id="haloButton">
+                <div class="halo-core">
+                    <span class="chronicle-icon">⏱️</span>
+                    <p class="cta-text">Entrez dans vos souvenirs</p>
+                </div>
+            </div>
+
+            <div class="memory-node">📸</div>
+            <div class="memory-node">💌</div>
+            <div class="memory-node">🎂</div>
+            <div class="memory-node">🏡</div>
+            <div class="memory-node">👶</div>
+            <div class="memory-node">🎓</div>
         </div>
     </div>
 
+    <button class="skip-button" id="skipButton">Passer l'intro</button>
+
     <script>
+        const CONFIG = {
+            stars: { count: 60 },
+            particles: { count: 25 },
+            explosion: { particleCount: 50, duration: 1000, maxDistance: 300 }
+        };
+
         function createStars() {
-            const layer = document.getElementById('starsLayer');
-            const count = window.innerWidth < 768 ? 40 : 60;
-            for (let i = 0; i < count; i++) {
+            const starsLayer = document.getElementById('starsLayer');
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < CONFIG.stars.count; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
                 star.style.top = Math.random() * 100 + '%';
                 star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (2 + Math.random() * 2) + 's';
+
                 const size = 1 + Math.random() * 2;
                 star.style.width = size + 'px';
                 star.style.height = size + 'px';
-                layer.appendChild(star);
+
+                fragment.appendChild(star);
+            }
+
+            starsLayer.appendChild(fragment);
+        }
+
+        function createParticles() {
+            const particlesBg = document.getElementById('particlesBg');
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < CONFIG.particles.count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 25 + 's';
+                particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+
+                fragment.appendChild(particle);
+            }
+
+            particlesBg.appendChild(fragment);
+        }
+
+        function createNeuralConnections() {
+            const svg = document.getElementById('neuralCanvas');
+            const centerX = 225;
+            const centerY = 225;
+            const radius = 180;
+            const nodeCount = 6;
+
+            const nodes = [];
+            for (let i = 0; i < nodeCount; i++) {
+                const angle = (i * 2 * Math.PI) / nodeCount;
+                nodes.push({
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                });
+            }
+
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', nodes[i].x);
+                    line.setAttribute('y1', nodes[i].y);
+                    line.setAttribute('x2', nodes[j].x);
+                    line.setAttribute('y2', nodes[j].y);
+                    line.setAttribute('class', 'neural-connection');
+                    line.style.animationDelay = ((i + j) * 0.2) + 's';
+
+                    svg.appendChild(line);
+                }
             }
         }
-        
-        document.addEventListener('DOMContentLoaded', createStars);
-        
+
+        function createExplosion() {
+            const haloButton = document.getElementById('haloButton');
+            const rect = haloButton.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const particleCount = CONFIG.explosion.particleCount;
+            const maxDistance = CONFIG.explosion.maxDistance;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'explosion-particle';
+
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const distance = maxDistance + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                particle.style.animation = `explode-particle ${CONFIG.explosion.duration}ms cubic-bezier(0.4, 0, 0.2, 1) forwards`;
+                particle.style.animationDelay = (Math.random() * 0.2) + 's';
+
+                document.body.appendChild(particle);
+
+                setTimeout(() => particle.remove(), CONFIG.explosion.duration + 200);
+            }
+
+            for (let i = 0; i < 15; i++) {
+                const trail = document.createElement('div');
+                trail.className = 'star-trail';
+
+                const angle = (Math.PI * 2 * i) / 15;
+                const distance = 120;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+
+                trail.style.left = centerX + 'px';
+                trail.style.top = centerY + 'px';
+                trail.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${angle}rad)`;
+                trail.style.animationDelay = (i * 0.03) + 's';
+
+                document.body.appendChild(trail);
+
+                setTimeout(() => trail.remove(), 1000);
+            }
+        }
+
+        function handleHaloClick() {
+            const introContainer = document.getElementById('introContainer');
+            const haloButton = document.getElementById('haloButton');
+
+            haloButton.style.pointerEvents = 'none';
+            introContainer.classList.add('exploding');
+            createExplosion();
+
+            setTimeout(() => {
+                introContainer.classList.add('transforming');
+                setTimeout(() => {
+                    window.location.href = 'cercles.html';
+                }, 800);
+            }, 1200);
+        }
+
+        function skipIntro() {
+            window.location.href = 'cercles.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            createParticles();
+            createNeuralConnections();
+
+            document.getElementById('haloButton').addEventListener('click', handleHaloClick);
+            document.getElementById('skipButton').addEventListener('click', skipIntro);
+        });
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                window.location.href = 'cercles.html';
+                const haloButton = document.getElementById('haloButton');
+                if (haloButton.style.pointerEvents !== 'none') {
+                    handleHaloClick();
+                }
+            }
+            if (e.key === 'Escape') {
+                skipIntro();
             }
         });
     </script>
