@@ -163,5 +163,62 @@ if (circles.length === 0) {
             }
         });
     </script>
+    <script src="js/storage.js"></script>
+    <script>
+        // Force le chargement
+        console.log('Storage:', typeof ChronicleStorage);
+        
+        function createStars() {
+            const layer = document.getElementById('starsLayer');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                const size = 1 + Math.random() * 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                layer.appendChild(star);
+            }
+        }
+
+        function renderCircles() {
+            console.log('renderCircles appelé');
+            const container = document.getElementById('circlesContainer');
+            container.innerHTML = '';
+            const circles = ChronicleStorage.getCircles();
+            console.log('Cercles chargés:', circles);
+            
+            circles.forEach((circle, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'circle-wrapper';
+                wrapper.innerHTML = '<div class="circle-halo"><div class="halo-core"><div class="circle-icon">' + circle.icon + '</div><div class="circle-name">' + circle.name + '</div></div></div>';
+                container.appendChild(wrapper);
+            });
+            
+            // Ajouter cercle "Nouveau"
+            const addWrapper = document.createElement('div');
+            addWrapper.className = 'circle-wrapper';
+            addWrapper.innerHTML = '<div class="circle-halo add-circle" onclick="alert(\'Créer un cercle\')"><div class="halo-core" style="border-style:dashed;"><div style="font-size:64px;opacity:0.7;">➕</div><div style="font-size:14px;font-weight:600;color:#E8C574;">NOUVEAU CERCLE</div></div></div>';
+            container.appendChild(addWrapper);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page chargée');
+            createStars();
+            renderCircles();
+            
+            // Créer cercle par défaut si vide
+            const circles = ChronicleStorage.getCircles();
+            if (circles.length === 0) {
+                console.log('Création cercle par défaut');
+                const family = ChronicleStorage.addCircle({ name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D4AF37' });
+                ChronicleStorage.addMember(family.id, { name: 'Moi', avatar: '👤', isAdmin: true });
+                renderCircles();
+            }
+        });
+    </script>
 </body>
+</html></body>
 </html>
