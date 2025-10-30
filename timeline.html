@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronicle - Timeline</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+    <style>
+        body { overflow: hidden; height: 100vh; }
+        .member-header { padding: 20px 30px; background: rgba(13, 20, 37, 0.95); backdrop-filter: blur(15px); border-bottom: 2px solid rgba(212, 175, 55, 0.3); display: flex; align-items: center; gap: 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+        .back-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); color: #E8C574; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+        .back-btn:hover { background: rgba(212, 175, 55, 0.4); transform: translateX(-3px); }
+        .member-info { flex: 1; }
+        .member-name-display { font-size: 24px; font-weight: 700; }
+        .add-event-btn { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #D4AF37, #E8C574); color: #0a0e1a; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
+        .add-event-btn:hover { transform: scale(1.1) rotate(90deg); }
+        .timeline-zone { position: fixed; top: 80px; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .timeline-line { position: absolute; bottom: 150px; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.8) 50%, rgba(212, 175, 55, 0.1)); z-index: 5; }
+        .events-container { position: absolute; bottom: 110px; left: 10%; right: 10%; height: 100px; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
+        .event-bubble { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(232, 197, 116, 0.2)); border: 2px solid #D4AF37; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); position: relative; animation: eventAppear 0.6s ease forwards; }
+        @keyframes eventAppear { from { opacity: 0; transform: scale(0) rotate(-180deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
+        .event-bubble:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
+        .empty-message { text-align: center; color: rgba(245, 245, 240, 0.7); z-index: 5; }
+        .active-event-zone { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; z-index: 50; display: none; }
+        .memory-orbit { position: fixed; width: 120px; opacity: 0; animation: memoryAppear 0.6s ease forwards; cursor: pointer; transition: all 0.3s; z-index: 60; }
+        @keyframes memoryAppear { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 40; display: none; opacity: 0; transition: opacity 0.3s; }
+        .overlay.visible { display: block; opacity: 1; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a2d47; border: 2px solid #D4AF37; border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; z-index: 200; }
+    </style>
+</head>
+<body>
+    <div class="atmospheric-bg"></div>
+    <div class="stars-layer" id="starsLayer"></div>
+    
+    <div class="member-header">
+        <div class="back-btn" onclick="history.back()">←</div>
+        <div class="member-info">
+            <div class="member-name-display" id="memberName"></div>
+            <div style="font-size: 14px; color: rgba(245, 245, 240, 0.7);">Timeline personnelle</div>
+        </div>
+        <div class="add-event-btn" onclick="showAddEventModal()">+</div>
+    </div>
+
+    <div class="timeline-zone">
+        <div class="timeline-line"></div>
+        <div class="events-container" id="eventsContainer"></div>
+        <div class="empty-message" id="emptyMessage">
+            <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.5;">📅</div>
+            <div style="font-size: 18px; margin-bottom: 10px;">Aucun événement</div>
+            <div style="font-size: 14px;">Cliquez sur + pour ajouter</div>
+        </div>
+    </div>
+
+    <div class="active-event-zone" id="activeEventZone"></div>
+    <div id="memoriesContainer"></div>
+    <div class="overlay" id="overlay" onclick="closeActiveEvent()"></div>
+
+    <script src="js/storage.js"></script>
+    <script>
+        let currentMemberId = new URLSearchParams(window.location.search).get('memberId');
+        let activeEventId = null;
+
+        function createStars() {
+            const layer = document.getElementById('starsLayer');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                const size = 1 + Math.random() * 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                layer.appendChild(star);
+            }
+        }
+
+        function loadMemberInfo() {
+            const data = ChronicleStorage.getData();
+            const member = data.members.find(m => m.id === currentMemberId);
+            if (member) {
+                document.getElementById('memberName').textContent = `${member.avatar} ${member.name}`;
+            }
+        }
+
+        function loadEvents() {
+            const events = ChronicleStorage.getEvents(currentMemberId);
+            const container = document.getElementById('eventsContainer');
+            const emptyMsg = document.getElementById('emptyMessage');
+            container.innerHTML = '';
+            
+            if (events.length === 0) {
+                emptyMsg.style.display = 'block';
+                return;
+            }
+            
+            emptyMsg.style.display = 'none';
+            events.forEach(event => {
+                const memories = ChronicleStorage.getMemories(event.id);
+                const bubble = document.createElement('div');
+                bubble.className = 'event-bubble';
+                bubble.onclick = () => openEvent(event.id);
+                bubble.innerHTML = `
+                    <div style="font-size: 36px;">${event.icon}</div>
+                    <div style="font-size: 10px; color: #D4AF37; font-weight: 600;">${event.year}</div>
+                    ${memories.length > 0 ? `<div style="position: absolute; top: -5px; right: -5px; background: linear-gradient(135deg, #D4AF37, #E8C574); color: #0a0e1a; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">${memories.length}</div>` : ''}
+                `;
+                container.appendChild(bubble);
+            });
+        }
+
+        function openEvent(eventId) {
+            activeEventId = eventId;
+            const event = ChronicleStorage.getEvents(currentMemberId).find(e => e.id === eventId);
+            if (!event) return;
+            
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+            
+            const zone = document.getElementById('activeEventZone');
+            zone.style.display = 'block';
+            const memories = ChronicleStorage.getMemories(eventId);
+            zone.innerHTML = `
+                <div class="halo-core" style="width: 100%; height: 100%; animation: pulse 2s infinite;">
+                    <div style="font-size: 72px;">${event.icon}</div>
+                    <div style="font-size: 18px; font-weight: 700; margin-top: 8px;">${event.year}</div>
+                    <div onclick="event.stopPropagation(); showAddMemoryModal('${eventId}')" style="position: absolute; top: 10px; right: 10px; width: 35px; height: 35px; background: linear-gradient(135deg, #4CAF50, #66BB6A); border-radius: 50%; color: white; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer;">+</div>
+                </div>
+            `;
+            
+            showMemoriesOrbit(event, memories);
+        }
+
+        function showMemoriesOrbit(event, memories) {
+            const container = document.getElementById('memoriesContainer');
+            container.innerHTML = '';
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) / 3.5;
+            
+            memories.forEach((memory, i) => {
+                const angle = (360 / memories.length) * i;
+                const radian = (angle - 90) * (Math.PI / 180);
+                const x = centerX + radius * Math.cos(radian);
+                const y = centerY + radius * Math.sin(radian);
+                
+                const memDiv = document.createElement('div');
+                memDiv.className = 'memory-orbit';
+                memDiv.style.left = `${x - 60}px`;
+                memDiv.style.top = `${y - 60}px`;
+                memDiv.style.animationDelay = `${i * 0.08}s`;
+                memDiv.onclick = () => viewMemory(memory);
+                
+                const typeIcons = {photo: '📸', video: '🎥', audio: '🎙️', document: '📄'};
+                memDiv.innerHTML = `
+                    <div style="background: rgba(26, 45, 71, 0.98); border: 2px solid rgba(212, 175, 55, 0.5); border-radius: 12px; padding: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: all 0.3s;">
+                        <div style="width: 100%; height: 70px; background: linear-gradient(135deg, #3d4e60, #4d5e70); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 8px; overflow: hidden;">
+                            ${memory.thumbnail ? `<img src="${memory.thumbnail}" style="width: 100%; height: 100%; object-fit: cover;">` : typeIcons[memory.type] || '📄'}
+                        </div>
+                        <div style="font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${memory.title}</div>
+                        <div style="font-size: 10px; color: #D4AF37; margin-top: 2px;">${typeIcons[memory.type]} ${memory.type}</div>
+                    </div>
+                `;
+                container.appendChild(memDiv);
+            });
+        }
+
+        function closeActiveEvent() {
+            const overlay = document.getElementById('overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('activeEventZone').style.display = 'none';
+                document.getElementById('memoriesContainer').innerHTML = '';
+            }, 300);
+            activeEventId = null;
+        }
+
+        function showAddEventModal() {
+            const emojis = {'Célébrations': ['🎂', '👰', '🎓', '🎉'], 'Famille': ['👶', '❤️', '🏡'], 'Voyages': ['✈️', '🏖️', '🗼'], 'Carrière': ['💼', '🏆', '📈']};
+            let html = '<div class="modal"><h2 style="color: #D4AF37; margin-bottom: 20px; text-align: center;">Ajouter un événement</h2>';
+            for (let cat in emojis) {
+                html += `<div style="margin-bottom: 20px;"><div style="color: #E8C574; font-size: 12px; font-weight: 600; margin-bottom: 10px;">${cat}</div><div style="display: flex; gap: 10px; flex-wrap: wrap;">`;
+                emojis[cat].forEach(emoji => {
+                    html += `<div onclick="selectEmoji('${emoji}')" style="width: 60px; height: 60px; background: rgba(26, 45, 71, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer;">${emoji}</div>`;
+                });
+                html += '</div></div>';
+            }
+            html += '<button onclick="closeModal()" style="width: 100%; padding: 12px; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 8px; color: #F5F5F0; cursor: pointer; margin-top: 20px;">Annuler</button></div>';
+            const modal = document.createElement('div');
+            modal.id = 'eventModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 150;';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function selectEmoji(emoji) {
+            const title = prompt('Titre :');
+            if (!title) return;
+            const dateStr = prompt('Date (JJ/MM/AAAA) :');
+            if (!dateStr) return;
+            const year = parseInt(dateStr.split('/')[2]) || new Date().getFullYear();
+            ChronicleStorage.addEvent({
+                circleId: new URLSearchParams(window.location.search).get('circleName'),
+                memberId: currentMemberId,
+                title, icon: emoji, date: dateStr, year
+            });
+            closeModal();
+            loadEvents();
+        }
+
+        function showAddMemoryModal(eventId) {
+            const html = `<div class="modal"><h2 style="color: #D4AF37; margin-bottom: 20px; text-align: center;">Ajouter un souvenir</h2>
+                <input type="text" id="memoryTitle" placeholder="Titre" style="width: 100%; padding: 12px; background: rgba(13, 20, 37, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: #F5F5F0; margin-bottom: 15px;">
+                <textarea id="memoryDesc" placeholder="Description" style="width: 100%; padding: 12px; background: rgba(13, 20, 37, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: #F5F5F0; min-height: 100px; margin-bottom: 15px;"></textarea>
+                <input type="file" id="memoryFile" accept="image/*,video/*,audio/*" style="width: 100%; padding: 12px; background: rgba(13, 20, 37, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: #F5F5F0; margin-bottom: 15px;">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 8px; color: #F5F5F0; cursor: pointer;">Annuler</button>
+                    <button onclick="saveMemory('${eventId}')" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #D4AF37, #E8C574); border: none; border-radius: 8px; color: #0a0e1a; font-weight: 600; cursor: pointer;">Enregistrer</button>
+                </div>
+            </div>`;
+            const modal = document.createElement('div');
+            modal.id = 'memoryModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 150;';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        async function saveMemory(eventId) {
+            const title = document.getElementById('memoryTitle').value.trim();
+            if (!title) { alert('Titre requis'); return; }
+            const desc = document.getElementById('memoryDesc').value.trim();
+            const file = document.getElementById('memoryFile').files[0];
+            let mediaUrl = null, thumbnail = null, type = 'document';
+            
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    type = 'photo';
+                    try {
+                        const compressed = await imageCompression(file, {maxSizeMB: 1, maxWidthOrHeight: 1920});
+                        mediaUrl = await fileToBase64(compressed);
+                        thumbnail = mediaUrl;
+                    } catch (e) {
+                        mediaUrl = await fileToBase64(file);
+                        thumbnail = mediaUrl;
+                    }
+                } else if (file.type.startsWith('video/')) {
+                    type = 'video';
+                    mediaUrl = await fileToBase64(file);
+                } else if (file.type.startsWith('audio/')) {
+                    type = 'audio';
+                    mediaUrl = await fileToBase64(file);
+                }
+            }
+            
+            ChronicleStorage.addMemory({ eventId, title, description: desc, type, mediaUrl, thumbnail });
+            closeModal();
+            if (activeEventId === eventId) {
+                closeActiveEvent();
+                setTimeout(() => openEvent(eventId), 300);
+            }
+            loadEvents();
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function viewMemory(memory) {
+            const typeIcons = {photo: '📸', video: '🎥', audio: '🎙️', document: '📄'};
+            let mediaHtml = '';
+            if (memory.mediaUrl) {
+                if (memory.type === 'photo') mediaHtml = `<img src="${memory.mediaUrl}" style="max-width: 100%; max-height: 400px; border-radius: 8px; margin: 15px 0;">`;
+                else if (memory.type === 'video') mediaHtml = `<video controls src="${memory.mediaUrl}" style="max-width: 100%; max-height: 400px; border-radius: 8px; margin: 15px 0;"></video>`;
+                else if (memory.type === 'audio') mediaHtml = `<audio controls src="${memory.mediaUrl}" style="width: 100%; margin: 15px 0;"></audio>`;
+            }
+            const html = `<div class="modal"><div onclick="closeModal()" style="position: absolute; top: 15px; right: 20px; font-size: 30px; color: #D4AF37; cursor: pointer;">&times;</div>
+                <h2 style="margin: 0 0 5px 0;">${memory.title}</h2>
+                <div style="color: #D4AF37; font-size: 13px; margin-bottom: 20px;">${typeIcons[memory.type]} ${memory.type}</div>
+                ${mediaHtml}
+                ${memory.description ? `<p style="color: rgba(245, 245, 240, 0.7); line-height: 1.6;">${memory.description}</p>` : ''}
+            </div>`;
+            const modal = document.createElement('div');
+            modal.id = 'viewModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 150;';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function closeModal() {
+            ['eventModal', 'memoryModal', 'viewModal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (modal) modal.remove();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            if (!currentMemberId) { alert('Membre non trouvé'); history.back(); return; }
+            loadMemberInfo();
+            loadEvents();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('eventModal') || document.getElementById('memoryModal') || document.getElementById('viewModal')) closeModal();
+                else if (activeEventId) closeActiveEvent();
+            }
+        });
+    </script>
+</body>
+</html>
