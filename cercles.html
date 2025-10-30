@@ -62,7 +62,8 @@
             const container = document.getElementById('circlesContainer');
             container.innerHTML = '';
             const circles = ChronicleStorage.getCircles();
-            
+            console.log('🔍 Nombre de cercles:', circles.length);
+console.log('📊 Cercles:', circles);
             circles.forEach((circle, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'circle-wrapper';
