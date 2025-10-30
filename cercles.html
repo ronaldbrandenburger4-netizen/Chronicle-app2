@@ -151,6 +151,11 @@
             createStars();
             renderCircles();
             const circles = ChronicleStorage.getCircles();
+            // Debug: forcer la création du cercle par défaut
+console.log('Circles:', circles);
+if (circles.length === 0) {
+    console.log('Création cercle par défaut...');
+}
             if (circles.length === 0) {
                 const family = ChronicleStorage.addCircle({ name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D4AF37' });
                 ChronicleStorage.addMember(family.id, { name: 'Moi', avatar: '👤', isAdmin: true });
