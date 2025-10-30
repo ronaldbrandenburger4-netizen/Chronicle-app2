@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronicle - Cercles</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { min-height: 100vh; overflow-x: hidden; }
+        .main-content { position: relative; z-index: 10; padding-top: 100px; padding-bottom: 50px; min-height: 100vh; }
+        .page-title { text-align: center; font-size: 36px; font-weight: 700; margin-bottom: 50px; }
+        .circles-container { position: relative; width: 100%; min-height: calc(100vh - 200px); padding: 40px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 120px; }
+        .circle-wrapper { position: relative; width: 400px; height: 400px; display: flex; align-items: center; justify-content: center; }
+        .circle-halo { position: relative; width: 200px; height: 200px; cursor: pointer; opacity: 0; animation: haloAppear 1s ease forwards; z-index: 10; }
+        @keyframes haloAppear { from { opacity: 0; transform: scale(0.5) rotate(-180deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
+        .circle-icon { font-size: 64px; margin-bottom: 12px; }
+        .circle-name { font-size: 18px; font-weight: 700; text-transform: uppercase; }
+        .circle-member-count { font-size: 12px; color: #E8C574; margin-top: 4px; }
+        .member-orbit { position: absolute; width: 80px; height: 80px; transition: all 0.4s ease; cursor: pointer; opacity: 0; animation: memberAppear 0.6s ease forwards; }
+        @keyframes memberAppear { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+        .member-avatar { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(232, 197, 116, 0.2)); border: 2px solid #D4AF37; display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transition: all 0.3s; }
+        .member-orbit:hover .member-avatar { transform: scale(1.2); box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
+        .member-name { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; white-space: nowrap; background: rgba(13, 20, 37, 0.9); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .member-orbit:hover .member-name { opacity: 1; }
+        .add-member-btn { position: absolute; top: -25px; right: -25px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #4CAF50, #66BB6A); color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); opacity: 0; animation: memberAppear 0.6s ease 0.8s forwards; }
+        .add-member-btn:hover { transform: scale(1.15) rotate(90deg); }
+        .add-circle { border-style: dashed; }
+        @media (max-width: 768px) { .circles-container { gap: 80px; } .circle-wrapper { width: 300px; height: 300px; } .circle-halo { width: 160px; height: 160px; } }
+    </style>
+</head>
+<body>
+    <div class="atmospheric-bg"></div>
+    <div class="stars-layer" id="starsLayer"></div>
+
+    <header class="header">
+        <div class="logo" onclick="window.location.href='index.html'">CHRONICLE</div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Vos Cercles</h1>
+        <div class="circles-container" id="circlesContainer"></div>
+    </main>
+
+    <script src="js/storage.js"></script>
+    <script>
+        function createStars() {
+            const layer = document.getElementById('starsLayer');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                const size = 1 + Math.random() * 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                layer.appendChild(star);
+            }
+        }
+
+        function renderCircles() {
+            const container = document.getElementById('circlesContainer');
+            container.innerHTML = '';
+            const circles = ChronicleStorage.getCircles();
+            
+            circles.forEach((circle, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'circle-wrapper';
+                
+                const halo = document.createElement('div');
+                halo.className = 'circle-halo';
+                halo.style.animationDelay = `${0.5 + index * 0.2}s`;
+                
+                const core = document.createElement('div');
+                core.className = 'halo-core';
+                core.innerHTML = `
+                    <div class="circle-icon">${circle.icon}</div>
+                    <div class="circle-name">${circle.name}</div>
+                    <div class="circle-member-count">${circle.memberCount || 0} membre${(circle.memberCount || 0) > 1 ? 's' : ''}</div>
+                `;
+                halo.appendChild(core);
+                wrapper.appendChild(halo);
+                
+                const members = ChronicleStorage.getMembers(circle.id);
+                const radius = 150;
+                members.forEach((member, i) => {
+                    const angle = (360 / Math.max(members.length, 4)) * i;
+                    const radian = (angle - 90) * (Math.PI / 180);
+                    const x = radius * Math.cos(radian);
+                    const y = radius * Math.sin(radian);
+                    
+                    const memberDiv = document.createElement('div');
+                    memberDiv.className = 'member-orbit';
+                    memberDiv.style.left = `calc(50% + ${x}px - 40px)`;
+                    memberDiv.style.top = `calc(50% + ${y}px - 40px)`;
+                    memberDiv.style.animationDelay = `${0.3 + i * 0.1}s`;
+                    memberDiv.onclick = () => window.location.href = `timeline.html?memberId=${member.id}&circleName=${encodeURIComponent(circle.name)}`;
+                    memberDiv.innerHTML = `
+                        <div class="member-avatar">${member.avatar}${member.isAdmin ? '<div style="position:absolute;top:-5px;right:-5px;width:22px;height:22px;background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;">👑</div>' : ''}</div>
+                        <div class="member-name">${member.name}</div>
+                    `;
+                    wrapper.appendChild(memberDiv);
+                });
+                
+                const addBtn = document.createElement('div');
+                addBtn.className = 'add-member-btn';
+                addBtn.textContent = '+';
+                addBtn.onclick = (e) => { e.stopPropagation(); addMember(circle.id); };
+                wrapper.appendChild(addBtn);
+                
+                container.appendChild(wrapper);
+            });
+            
+            const addWrapper = document.createElement('div');
+            addWrapper.className = 'circle-wrapper';
+            const addHalo = document.createElement('div');
+            addHalo.className = 'circle-halo add-circle';
+            addHalo.style.animationDelay = `${0.5 + circles.length * 0.2}s`;
+            addHalo.onclick = createCircle;
+            addHalo.innerHTML = `<div class="halo-core" style="border-style:dashed;"><div style="font-size:64px;opacity:0.7;">➕</div><div style="font-size:14px;font-weight:600;color:#E8C574;">NOUVEAU CERCLE</div></div>`;
+            addWrapper.appendChild(addHalo);
+            container.appendChild(addWrapper);
+        }
+
+        function createCircle() {
+            const name = prompt('Nom du cercle :');
+            if (!name) return;
+            const emojis = ['👨‍👩‍👧‍👦', '🎉', '💼', '🏠', '✈️', '🎓'];
+            const icon = prompt(`Emoji :\n${emojis.join(' ')}\n\nOu tapez le vôtre :`) || emojis[0];
+            const circle = ChronicleStorage.addCircle({ name, icon, color: '#D4AF37' });
+            const adminName = prompt('Premier membre (admin) :');
+            if (adminName) {
+                const avatars = ['👨', '👩', '👦', '👧', '🧑'];
+                const avatar = prompt(`Avatar :\n${avatars.join(' ')}`) || '👤';
+                ChronicleStorage.addMember(circle.id, { name: adminName, avatar, isAdmin: true });
+            }
+            renderCircles();
+        }
+
+        function addMember(circleId) {
+            const name = prompt('Nom du membre :');
+            if (!name) return;
+            const avatars = ['👨', '👩', '👦', '👧', '🧑', '👴', '👵'];
+            const avatar = prompt(`Avatar :\n${avatars.join(' ')}`) || '👤';
+            const isAdmin = confirm('Admin ?');
+            ChronicleStorage.addMember(circleId, { name, avatar, isAdmin });
+            renderCircles();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            renderCircles();
+            const circles = ChronicleStorage.getCircles();
+            if (circles.length === 0) {
+                const family = ChronicleStorage.addCircle({ name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D4AF37' });
+                ChronicleStorage.addMember(family.id, { name: 'Moi', avatar: '👤', isAdmin: true });
+                renderCircles();
+            }
+        });
+    </script>
+</body>
+</html>
