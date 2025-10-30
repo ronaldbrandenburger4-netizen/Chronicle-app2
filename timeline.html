@@ -1,229 +1,575 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chronicle - Timeline</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(180deg, #0a0e1a 0%, #1a2d47 50%, #2d4a6e 100%);
-            min-height: 100vh;
-            color: #F5F5F0;
-            overflow-x: hidden;
+        :root {
+            --color-primary: #D4AF37;
+            --color-primary-light: #E8C574;
+            --color-bg-dark: #0d1425;
+            --color-bg-medium: #1a2d47;
+            --color-bg-light: #2d4a6e;
+            --color-text: #F5F5F0;
+            --color-card-bg: rgba(30, 40, 60, 0.95);
+            --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 5px 20px rgba(0, 0, 0, 0.5);
+            --shadow-large: 0 10px 50px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px rgba(212, 175, 55, 0.4);
+            --transition-fast: 0.3s ease;
+            --transition-medium: 0.4s ease;
+            --transition-slow: 0.6s ease;
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --header-height: 70px;
         }
-        .header {
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, var(--color-bg-light) 0%, var(--color-bg-medium) 50%, var(--color-bg-dark) 100%);
+            height: 100vh;
+            color: var(--color-text);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .atmospheric-bg {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            height: 70px;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(45, 74, 110, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(26, 45, 71, 0.3) 0%, transparent 50%);
+            animation: atmosphere-shift 20s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes atmosphere-shift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        .stars-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .header {
+            padding: 15px 20px;
             background: rgba(13, 20, 37, 0.95);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(212, 175, 55, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            z-index: 100;
+            height: var(--header-height);
+            z-index: 1001;
+            position: relative;
         }
+
         .back-btn {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             background: rgba(212, 175, 55, 0.2);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            color: #E8C574;
+            color: var(--color-primary-light);
             font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             text-decoration: none;
+            transition: all 0.3s ease;
         }
+
+        .back-btn:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: scale(1.1);
+        }
+
         .member-info {
             flex: 1;
             text-align: center;
             font-size: 20px;
             font-weight: 700;
         }
+
         .add-btn {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #D4AF37, #E8C574);
-            color: #0a0e1a;
-            font-size: 28px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 24px;
+            color: var(--color-bg-dark);
             cursor: pointer;
-            border: none;
+            transition: all 0.3s var(--transition-bounce);
             font-weight: bold;
+            box-shadow: var(--shadow-small);
+            border: none;
         }
-        .main-content {
-            padding-top: 100px;
-            padding-bottom: 50px;
-            min-height: 100vh;
+
+        .add-btn:hover {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-glow);
         }
-        .timeline {
-            max-width: 800px;
-            margin: 0 auto;
+
+        .timeline-container {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
             padding: 20px;
+            padding-bottom: 100px;
+            overflow: hidden;
+            position: relative;
         }
-        .event {
-            background: rgba(26, 45, 71, 0.95);
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+
+        .timeline-line {
+            position: fixed;
+            bottom: 150px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.8) 50%, rgba(212, 175, 55, 0.2) 100%);
+            z-index: 5;
         }
-        .event-header {
+
+        .events-wrapper {
+            position: fixed;
+            bottom: 110px;
+            left: 5%;
+            right: 5%;
+            height: 100px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .event-bubble {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(232, 197, 116, 0.2) 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            position: relative;
+        }
+
+        .event-bubble:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .event-icon {
+            font-size: 32px;
+        }
+
+        .event-year {
+            color: var(--color-primary);
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .event-title {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(13, 20, 37, 0.95);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .event-bubble:hover .event-title {
+            opacity: 1;
+        }
+
+        .memory-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            color: var(--color-bg-dark);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        .event-icon { font-size: 40px; }
-        .event-title { font-size: 20px; font-weight: 700; }
-        .event-date { font-size: 14px; color: #E8C574; }
-        .empty-message {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(245, 245, 240, 0.7);
+
+        .add-memory-btn {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
         }
-        .modal {
-            display: none;
+
+        .add-memory-btn:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+        }
+
+        .event-bubble.new {
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0); }
+            50% { transform: scale(1.15); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .event-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 30;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .modal.visible { display: flex; }
-        .modal-content {
-            background: #1a2d47;
-            border: 2px solid #D4AF37;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
+
+        .event-overlay.visible {
+            display: block;
+            opacity: 1;
         }
-        .modal-title {
-            color: #D4AF37;
-            font-size: 24px;
-            margin-bottom: 20px;
+
+        .event-center-container {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            z-index: 500;
+            pointer-events: none;
+            display: none;
+        }
+
+        .event-center-container.visible {
+            display: block;
+        }
+
+        .event-bubble.active {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 160px;
+            height: 160px;
+            box-shadow: 0 0 80px rgba(212, 175, 55, 1);
+            transition: all 0.5s var(--transition-bounce);
+            animation: pulseCenter 2s ease-in-out infinite;
+            border-width: 4px;
+            pointer-events: all;
+        }
+
+        @keyframes pulseCenter {
+            0%, 100% {
+                box-shadow: 0 0 80px rgba(212, 175, 55, 0.9);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                box-shadow: 0 0 100px rgba(212, 175, 55, 1);
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        .event-bubble.active .event-icon {
+            font-size: 70px;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+        }
+
+        .event-bubble.active .event-year {
+            font-size: 16px;
+            font-weight: 700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .event-bubble.active .event-title {
+            display: none;
+        }
+
+        .event-bubble.active .memory-count {
+            top: 8px;
+            right: 8px;
+            width: 35px;
+            height: 35px;
+            font-size: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+        }
+
+        .event-bubble.active .add-memory-btn {
+            top: 8px;
+            left: 8px;
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+        }
+
+        .event-label {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
+            z-index: 502;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+
+        .event-label.visible {
+            opacity: 1;
         }
-        .emoji-btn {
-            width: 60px;
-            height: 60px;
-            background: rgba(26, 45, 71, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 10px;
+
+        .event-label-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--color-text);
+            margin-bottom: 8px;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.7);
+            letter-spacing: 0.5px;
+        }
+
+        .event-label-date {
+            font-size: 18px;
+            color: var(--color-primary);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .memory-orbit {
+            position: fixed;
+            width: 110px;
+            transition: all 0.5s var(--transition-bounce);
+            opacity: 0;
+            transform: scale(0) rotate(-180deg);
+            z-index: 40;
+        }
+
+        .memory-orbit.visible {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .memory-orbit.closing {
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+            transition: all 0.4s ease;
+        }
+
+        .memory-card {
+            width: 100%;
+            background: rgba(26, 45, 71, 0.98);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .memory-card:hover {
+            transform: scale(1.15) translateY(-5px);
+            border-color: var(--color-primary);
+            box-shadow: 0 10px 35px rgba(212, 175, 55, 0.5);
+            z-index: 50;
+        }
+
+        .memory-thumb {
+            width: 100%;
+            height: 65px;
+            background: linear-gradient(135deg, #3d4e60 0%, #4d5e70 100%);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-bottom: 8px;
+            transition: transform 0.3s ease;
+            overflow: hidden;
         }
-        .emoji-btn:hover, .emoji-btn.selected {
-            border-color: #D4AF37;
+
+        .memory-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .memory-card:hover .memory-thumb {
             transform: scale(1.1);
         }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            color: #E8C574;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(13, 20, 37, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 8px;
-            color: #F5F5F0;
-            font-size: 16px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
+
+        .memory-title {
+            font-size: 12px;
             font-weight: 600;
-            cursor: pointer;
-            font-size: 16px;
+            color: var(--color-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
         }
-        .btn-cancel {
-            background: rgba(212, 175, 55, 0.2);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            color: #F5F5F0;
+
+        .memory-card:hover .memory-title {
+            color: var(--color-primary);
         }
-        .btn-save {
-            background: linear-gradient(135deg, #D4AF37, #E8C574);
-            color: #0a0e1a;
+
+        .memory-type {
+            color: var(--color-primary);
+            font-size: 10px;
+        }
+
+        .connection-line {
+            position: fixed;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.6) 50%, rgba(212, 175, 55, 0) 100%);
+            transform-origin: left center;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 35;
+        }
+
+        .connection-line.visible {
+            opacity: 1;
+        }
+
+        .connection-line.closing {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(245, 245, 240, 0.7);
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(212, 175, 55, 0.6);
+            font-size: 13px;
+            text-align: center;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            .member-info {
+                font-size: 16px;
+            }
+
+            .event-bubble {
+                width: 60px;
+                height: 60px;
+            }
+
+            .event-icon {
+                font-size: 28px;
+            }
+
+            .memory-orbit {
+                width: 90px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="atmospheric-bg"></div>
+    <div class="stars-layer" id="starsLayer"></div>
+
     <header class="header">
         <a href="cercles.html" class="back-btn">←</a>
-        <div class="member-info" id="memberInfo">👤 Moi - Timeline personnelle</div>
-        <button class="add-btn" onclick="showAddModal()">+</button>
+        <div class="member-info" id="memberInfo">Timeline</div>
+        <button class="add-btn" id="addBtn" onclick="showAddEventModal()">+</button>
     </header>
 
-    <main class="main-content">
-        <div class="timeline" id="timeline"></div>
+    <main class="timeline-container">
+        <div class="timeline-line"></div>
+        <div class="events-wrapper" id="eventsWrapper"></div>
     </main>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">➕ Ajouter un événement</h2>
-            
-            <div class="emoji-grid" id="emojiGrid"></div>
-            
-            <div class="input-group">
-                <label>Titre de l'événement</label>
-                <input type="text" id="eventTitle" placeholder="Ex: Mon anniversaire">
-            </div>
-            
-            <div class="input-group">
-                <label>Date (JJ/MM/AAAA)</label>
-                <input type="text" id="eventDate" placeholder="Ex: 15/03/2024">
-            </div>
-            
-            <div class="btn-group">
-                <button class="btn btn-cancel" onclick="closeModal()">Annuler</button>
-                <button class="btn btn-save" onclick="saveEvent()">Enregistrer</button>
-            </div>
-        </div>
+    <div class="event-overlay" id="eventOverlay" onclick="closeEvent()"></div>
+    <div class="event-label" id="eventLabel">
+        <div class="event-label-title" id="eventLabelTitle"></div>
+        <div class="event-label-date" id="eventLabelDate"></div>
     </div>
+    <div class="event-center-container" id="eventCenterContainer"></div>
+    <div id="memoriesContainer"></div>
+    <div id="connectionsContainer"></div>
+
+    <div class="instructions">Cliquez sur un événement pour voir les souvenirs</div>
 
     <script>
         const STORAGE_KEY = 'chronicle_data';
-        const EMOJIS = ['🎂', '👰', '🎓', '🏡', '✈️', '💼', '🎉', '❤️', '👶', '🏆', '🎮', '📚'];
-        let selectedEmoji = '🎂';
+        let activeEventId = null;
         let currentMemberId = new URLSearchParams(window.location.search).get('memberId');
 
         function getData() {
@@ -235,30 +581,37 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
-        function renderEmojis() {
-            const grid = document.getElementById('emojiGrid');
-            grid.innerHTML = '';
-            EMOJIS.forEach(emoji => {
-                const btn = document.createElement('div');
-                btn.className = 'emoji-btn';
-                btn.textContent = emoji;
-                btn.onclick = () => {
-                    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedEmoji = emoji;
-                };
-                if (emoji === selectedEmoji) btn.classList.add('selected');
-                grid.appendChild(btn);
-            });
+        function createStars() {
+            const layer = document.getElementById('starsLayer');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                const size = 1 + Math.random() * 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                layer.appendChild(star);
+            }
         }
 
         function renderTimeline() {
-            const timeline = document.getElementById('timeline');
+            const wrapper = document.getElementById('eventsWrapper');
+            wrapper.innerHTML = '';
             const data = getData();
-            const events = data.events.filter(e => e.memberId === currentMemberId).sort((a, b) => a.year - b.year);
+            
+            let events = data.events || [];
+            if (currentMemberId) {
+                events = events.filter(e => e.memberId === currentMemberId);
+                const member = data.members.find(m => m.id === currentMemberId);
+                if (member) {
+                    document.getElementById('memberInfo').textContent = `${member.avatar} ${member.name} - Timeline`;
+                }
+            }
 
             if (events.length === 0) {
-                timeline.innerHTML = `
+                wrapper.innerHTML = `
                     <div class="empty-message">
                         <div style="font-size: 64px; margin-bottom: 20px;">📅</div>
                         <div style="font-size: 18px; margin-bottom: 10px;">Aucun événement</div>
@@ -268,70 +621,182 @@
                 return;
             }
 
-            timeline.innerHTML = '';
+            events.sort((a, b) => (a.year || 0) - (b.year || 0));
+
             events.forEach(event => {
-                const div = document.createElement('div');
-                div.className = 'event';
-                div.innerHTML = `
-                    <div class="event-header">
-                        <div class="event-icon">${event.icon}</div>
-                        <div>
-                            <div class="event-title">${event.title}</div>
-                            <div class="event-date">${event.date} (${event.year})</div>
-                        </div>
+                const bubble = document.createElement('div');
+                bubble.className = 'event-bubble';
+                bubble.id = event.id;
+                bubble.onclick = () => toggleEvent(event.id);
+                
+                const memories = (event.memories || []).length;
+                
+                bubble.innerHTML = `
+                    <div class="event-icon">${event.icon}</div>
+                    <div class="event-year">${event.year || new Date().getFullYear()}</div>
+                    <div class="memory-count">${memories}</div>
+                    <div class="event-title">${event.title}</div>
+                `;
+                
+                wrapper.appendChild(bubble);
+            });
+        }
+
+        function toggleEvent(eventId) {
+            if (activeEventId === eventId) {
+                closeEvent();
+            } else {
+                if (activeEventId) closeEvent();
+                openEvent(eventId);
+            }
+        }
+
+        function openEvent(eventId) {
+            activeEventId = eventId;
+            const data = getData();
+            const event = data.events.find(e => e.id === eventId);
+            if (!event) return;
+
+            const bubble = document.getElementById(eventId);
+            const centerContainer = document.getElementById('eventCenterContainer');
+            
+            const bubbleClone = bubble.cloneNode(true);
+            bubbleClone.id = eventId + '-center';
+            bubbleClone.classList.add('active');
+            bubbleClone.onclick = null;
+            
+            centerContainer.innerHTML = '';
+            centerContainer.appendChild(bubbleClone);
+            centerContainer.classList.add('visible');
+            
+            bubble.style.opacity = '0';
+
+            document.getElementById('eventOverlay').classList.add('visible');
+            document.getElementById('eventLabelTitle').textContent = event.title;
+            document.getElementById('eventLabelDate').textContent = event.date || `Année ${event.year}`;
+            document.getElementById('eventLabel').classList.add('visible');
+
+            setTimeout(() => {
+                if (activeEventId === eventId) {
+                    createMemoriesOrbit(event, bubbleClone);
+                }
+            }, 300);
+        }
+
+        function closeEvent() {
+            if (!activeEventId) return;
+
+            const bubble = document.getElementById(activeEventId);
+            const centerContainer = document.getElementById('eventCenterContainer');
+            
+            if (bubble) {
+                bubble.style.opacity = '1';
+                bubble.classList.remove('active');
+            }
+            
+            centerContainer.classList.remove('visible');
+            setTimeout(() => {
+                centerContainer.innerHTML = '';
+            }, 300);
+
+            document.getElementById('eventOverlay').classList.remove('visible');
+            document.getElementById('eventLabel').classList.remove('visible');
+
+            const memories = document.querySelectorAll('.memory-orbit');
+            const lines = document.querySelectorAll('.connection-line');
+            
+            memories.forEach((mem, index) => {
+                mem.style.transitionDelay = (index * 0.03) + 's';
+                mem.classList.add('closing');
+            });
+            
+            lines.forEach((line, index) => {
+                line.style.transitionDelay = (index * 0.03) + 's';
+                line.classList.add('closing');
+            });
+
+            setTimeout(() => {
+                document.getElementById('memoriesContainer').innerHTML = '';
+                document.getElementById('connectionsContainer').innerHTML = '';
+            }, 500);
+
+            activeEventId = null;
+        }
+
+        function createMemoriesOrbit(event, bubble) {
+            const memoriesContainer = document.getElementById('memoriesContainer');
+            const connectionsContainer = document.getElementById('connectionsContainer');
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) / 3;
+
+            const memories = event.memories || [];
+
+            memories.forEach((memory, index) => {
+                const angle = ((360 / memories.length) * index) + 45;
+                const radian = (angle - 90) * (Math.PI / 180);
+                const x = centerX + radius * Math.cos(radian);
+                const y = centerY + radius * Math.sin(radian);
+
+                const memoryDiv = document.createElement('div');
+                memoryDiv.className = 'memory-orbit';
+                memoryDiv.style.left = (x - 55) + 'px';
+                memoryDiv.style.top = (y - 55) + 'px';
+                memoryDiv.style.transitionDelay = (index * 0.06) + 's';
+
+                const thumbContent = memory.thumbnail 
+                    ? `<img src="${memory.thumbnail}" alt="${memory.title}">`
+                    : memory.icon || '📝';
+
+                memoryDiv.innerHTML = `
+                    <div class="memory-card">
+                        <div class="memory-thumb">${thumbContent}</div>
+                        <div class="memory-title">${memory.title}</div>
+                        <div class="memory-type">${memory.type || 'Souvenir'}</div>
                     </div>
                 `;
-                timeline.appendChild(div);
+
+                memoriesContainer.appendChild(memoryDiv);
+
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                const lineLength = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                const lineAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+
+                line.style.width = lineLength + 'px';
+                line.style.left = centerX + 'px';
+                line.style.top = centerY + 'px';
+                line.style.transform = `rotate(${lineAngle}deg)`;
+                line.style.transitionDelay = (index * 0.06) + 's';
+
+                connectionsContainer.appendChild(line);
+
+                requestAnimationFrame(() => {
+                    memoryDiv.classList.add('visible');
+                    line.classList.add('visible');
+                });
             });
         }
 
-        function showAddModal() {
-            document.getElementById('modal').classList.add('visible');
-            renderEmojis();
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('visible');
-            document.getElementById('eventTitle').value = '';
-            document.getElementById('eventDate').value = '';
-        }
-
-        function saveEvent() {
-            const title = document.getElementById('eventTitle').value.trim();
-            const date = document.getElementById('eventDate').value.trim();
-
-            if (!title || !date) {
-                alert('⚠️ Veuillez remplir tous les champs !');
-                return;
-            }
-
-            const parts = date.split('/');
-            const year = parseInt(parts[2]) || new Date().getFullYear();
-
-            const data = getData();
-            data.events.push({
-                id: 'event_' + Date.now(),
-                circleId: 'circle_' + Date.now(),
-                memberId: currentMemberId,
-                title: title,
-                icon: selectedEmoji,
-                date: date,
-                year: year
-            });
-            saveData(data);
-
-            closeModal();
-            renderTimeline();
-            alert('✅ Événement ajouté !');
+        function showAddEventModal() {
+            alert('Fonctionnalité d\'ajout d\'événement à venir !');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!currentMemberId) {
-                alert('❌ Membre introuvable !');
+                alert('Aucun membre sélectionné');
                 window.location.href = 'cercles.html';
                 return;
             }
+            createStars();
             renderTimeline();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeEvent();
+            }
         });
     </script>
 </body>
