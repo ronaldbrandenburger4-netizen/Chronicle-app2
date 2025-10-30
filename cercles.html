@@ -4,59 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chronicle - Cercles</title>
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        body { min-height: 100vh; overflow-x: hidden; }
-        .main-content { position: relative; z-index: 10; padding-top: 100px; padding-bottom: 50px; min-height: 100vh; }
-        .page-title { text-align: center; font-size: 36px; font-weight: 700; margin-bottom: 50px; }
-        .circles-container { position: relative; width: 100%; min-height: calc(100vh - 200px); padding: 40px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 120px; }
-        .circle-wrapper { position: relative; width: 400px; height: 400px; display: flex; align-items: center; justify-content: center; }
-        .circle-halo { position: relative; width: 200px; height: 200px; cursor: pointer; opacity: 0; animation: haloAppear 1s ease forwards; z-index: 10; }
-        @keyframes haloAppear { from { opacity: 0; transform: scale(0.5) rotate(-180deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
-        
-        /* AJOUT CRITIQUE : Style pour halo-core */
-        .halo-core {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #0a0e1a 0%, #1a2d47 50%, #2d4a6e 100%);
+            min-height: 100vh;
+            color: #F5F5F0;
+            overflow-x: hidden;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(13, 20, 37, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #D4AF37, #FFD700, #E8C574);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+        .main-content {
+            padding-top: 120px;
+            padding-bottom: 50px;
+            min-height: 100vh;
+        }
+        .page-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 50px;
+        }
+        .circles-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 100px;
+            padding: 40px;
+        }
+        .circle-wrapper {
             position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .circle-halo {
+            position: relative;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, rgba(255, 215, 0, 0.15) 30%, rgba(212, 175, 55, 0.1) 60%, transparent 100%);
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3), transparent);
             border: 2px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 0 60px rgba(212, 175, 55, 0.5), 0 0 100px rgba(232, 197, 116, 0.3), inset 0 0 40px rgba(255, 215, 0, 0.15);
-            backdrop-filter: blur(10px);
-            transition: all 0.5s ease;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.6);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100%;
-            animation: halo-pulse 4s ease-in-out infinite;
+            cursor: pointer;
+            animation: pulse 3s infinite;
         }
-        
-        @keyframes halo-pulse {
-            0%, 100% {
-                box-shadow: 0 0 60px rgba(212, 175, 55, 0.5), 0 0 100px rgba(232, 197, 116, 0.3), inset 0 0 40px rgba(255, 215, 0, 0.15);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 0 90px rgba(212, 175, 55, 0.8), 0 0 140px rgba(232, 197, 116, 0.5), inset 0 0 60px rgba(255, 215, 0, 0.25);
-                transform: scale(1.03);
-            }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(212, 175, 55, 0.6); }
+            50% { box-shadow: 0 0 90px rgba(212, 175, 55, 0.9); }
         }
-        
         .circle-icon { font-size: 64px; margin-bottom: 12px; }
         .circle-name { font-size: 18px; font-weight: 700; text-transform: uppercase; }
-        .circle-member-count { font-size: 12px; color: #E8C574; margin-top: 4px; }
-        .member-orbit { position: absolute; width: 80px; height: 80px; transition: all 0.4s ease; cursor: pointer; opacity: 0; animation: memberAppear 0.6s ease forwards; }
-        @keyframes memberAppear { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
-        .member-avatar { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(232, 197, 116, 0.2)); border: 2px solid #D4AF37; display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transition: all 0.3s; }
-        .member-orbit:hover .member-avatar { transform: scale(1.2); box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
-        .member-name { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; white-space: nowrap; background: rgba(13, 20, 37, 0.9); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-        .member-orbit:hover .member-name { opacity: 1; }
-        .add-member-btn { position: absolute; top: -25px; right: -25px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #4CAF50, #66BB6A); color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); opacity: 0; animation: memberAppear 0.6s ease 0.8s forwards; }
-        .add-member-btn:hover { transform: scale(1.15) rotate(90deg); }
-        .add-circle { border-style: dashed; }
-        
-        /* BOUTON RESET */
+        .member-orbit {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+        }
+        .member-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(232, 197, 116, 0.2));
+            border: 2px solid #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s;
+        }
+        .member-orbit:hover .member-avatar {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+        }
         .reset-btn {
             position: fixed;
             bottom: 20px;
@@ -67,28 +116,13 @@
             border: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
             z-index: 1000;
-            transition: all 0.3s;
-        }
-        .reset-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.6);
-        }
-        
-        @media (max-width: 768px) { 
-            .circles-container { gap: 80px; } 
-            .circle-wrapper { width: 300px; height: 300px; } 
-            .circle-halo { width: 160px; height: 160px; }
         }
     </style>
 </head>
 <body>
-    <div class="atmospheric-bg"></div>
-    <div class="stars-layer" id="starsLayer"></div>
-
     <header class="header">
         <div class="logo" onclick="window.location.href='index.html'">CHRONICLE</div>
     </header>
@@ -98,147 +132,114 @@
         <div class="circles-container" id="circlesContainer"></div>
     </main>
     
-    <button class="reset-btn" onclick="resetApp()">🔄 RESET APP</button>
+    <button class="reset-btn" onclick="resetApp()">🔄 RESET</button>
 
-    <script src="js/storage.js"></script>
     <script>
-        // Fonction RESET
-        window.resetApp = function() {
-            if (confirm('⚠️ Réinitialiser l\'application ?\n\nToutes les données (cercles, membres, événements) seront SUPPRIMÉES !')) {
+        // STORAGE SIMPLIFIÉ
+        const STORAGE_KEY = 'chronicle_data';
+        
+        function getData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { circles: [], members: [], events: [], memories: [] };
+        }
+        
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        function addCircle(name, icon) {
+            const data = getData();
+            const circle = {
+                id: 'circle_' + Date.now(),
+                name: name,
+                icon: icon,
+                memberCount: 0
+            };
+            data.circles.push(circle);
+            saveData(data);
+            return circle;
+        }
+        
+        function addMember(circleId, name, avatar) {
+            const data = getData();
+            const member = {
+                id: 'member_' + Date.now(),
+                circleId: circleId,
+                name: name,
+                avatar: avatar,
+                isAdmin: true
+            };
+            data.members.push(member);
+            const circle = data.circles.find(c => c.id === circleId);
+            if (circle) circle.memberCount++;
+            saveData(data);
+            return member;
+        }
+        
+        function resetApp() {
+            if (confirm('⚠️ SUPPRIMER TOUTES LES DONNÉES ?')) {
                 localStorage.clear();
-                alert('✅ Application réinitialisée !\n\nLa page va se recharger...');
+                alert('✅ Données supprimées !');
                 location.reload();
             }
-        };
-        
-        function createStars() {
-            const layer = document.getElementById('starsLayer');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                const size = 1 + Math.random() * 2;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
-                layer.appendChild(star);
-            }
         }
-
-        function renderCircles() {
-            console.log('🔄 renderCircles appelé');
+        
+        function render() {
             const container = document.getElementById('circlesContainer');
             container.innerHTML = '';
-            const circles = ChronicleStorage.getCircles();
-            console.log('🔍 Cercles chargés:', circles.length, circles);
+            const data = getData();
             
-            circles.forEach((circle, index) => {
+            console.log('📊 Données:', data);
+            
+            // Si vide, créer cercle par défaut
+            if (data.circles.length === 0) {
+                console.log('➕ Création cercle Famille');
+                const family = addCircle('Famille', '👨‍👩‍👧‍👦');
+                addMember(family.id, 'Moi', '👤');
+                location.reload();
+                return;
+            }
+            
+            // Afficher les cercles
+            data.circles.forEach(circle => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'circle-wrapper';
                 
-                const halo = document.createElement('div');
-                halo.className = 'circle-halo';
-                halo.style.animationDelay = `${0.5 + index * 0.2}s`;
-                
-                const core = document.createElement('div');
-                core.className = 'halo-core';
-                core.innerHTML = `
-                    <div class="circle-icon">${circle.icon}</div>
-                    <div class="circle-name">${circle.name}</div>
-                    <div class="circle-member-count">${circle.memberCount || 0} membre${(circle.memberCount || 0) > 1 ? 's' : ''}</div>
+                wrapper.innerHTML = `
+                    <div class="circle-halo">
+                        <div class="circle-icon">${circle.icon}</div>
+                        <div class="circle-name">${circle.name}</div>
+                    </div>
                 `;
-                halo.appendChild(core);
-                wrapper.appendChild(halo);
                 
-                const members = ChronicleStorage.getMembers(circle.id);
-                console.log('👥 Membres du cercle', circle.name, ':', members.length, members);
-                
+                // Afficher les membres en orbite
+                const members = data.members.filter(m => m.circleId === circle.id);
                 const radius = 150;
+                
                 members.forEach((member, i) => {
                     const angle = (360 / Math.max(members.length, 4)) * i;
                     const radian = (angle - 90) * (Math.PI / 180);
                     const x = radius * Math.cos(radian);
                     const y = radius * Math.sin(radian);
                     
-                    console.log('📍 Membre', member.name, 'position:', x, y);
-                    
                     const memberDiv = document.createElement('div');
                     memberDiv.className = 'member-orbit';
                     memberDiv.style.left = `calc(50% + ${x}px - 40px)`;
                     memberDiv.style.top = `calc(50% + ${y}px - 40px)`;
-                    memberDiv.style.animationDelay = `${0.3 + i * 0.1}s`;
-                    memberDiv.onclick = () => window.location.href = `timeline.html?memberId=${member.id}&circleName=${encodeURIComponent(circle.name)}`;
-                    memberDiv.innerHTML = `
-                        <div class="member-avatar">${member.avatar}${member.isAdmin ? '<div style="position:absolute;top:-5px;right:-5px;width:22px;height:22px;background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;">👑</div>' : ''}</div>
-                        <div class="member-name">${member.name}</div>
-                    `;
+                    memberDiv.onclick = () => window.location.href = `timeline.html?memberId=${member.id}`;
+                    memberDiv.innerHTML = `<div class="member-avatar">${member.avatar}</div>`;
+                    
                     wrapper.appendChild(memberDiv);
                 });
                 
-                const addBtn = document.createElement('div');
-                addBtn.className = 'add-member-btn';
-                addBtn.textContent = '+';
-                addBtn.onclick = (e) => { e.stopPropagation(); addMember(circle.id); };
-                wrapper.appendChild(addBtn);
-                
                 container.appendChild(wrapper);
             });
-            
-            const addWrapper = document.createElement('div');
-            addWrapper.className = 'circle-wrapper';
-            const addHalo = document.createElement('div');
-            addHalo.className = 'circle-halo add-circle';
-            addHalo.style.animationDelay = `${0.5 + circles.length * 0.2}s`;
-            addHalo.onclick = createCircle;
-            addHalo.innerHTML = `<div class="halo-core" style="border-style:dashed;"><div style="font-size:64px;opacity:0.7;">➕</div><div style="font-size:14px;font-weight:600;color:#E8C574;">NOUVEAU CERCLE</div></div>`;
-            addWrapper.appendChild(addHalo);
-            container.appendChild(addWrapper);
         }
-
-        function createCircle() {
-            const name = prompt('Nom du cercle :');
-            if (!name) return;
-            const emojis = ['👨‍👩‍👧‍👦', '🎉', '💼', '🏠', '✈️', '🎓'];
-            const icon = prompt(`Emoji :\n${emojis.join(' ')}\n\nOu tapez le vôtre :`) || emojis[0];
-            const circle = ChronicleStorage.addCircle({ name, icon, color: '#D4AF37' });
-            const adminName = prompt('Premier membre (admin) :');
-            if (adminName) {
-                const avatars = ['👨', '👩', '👦', '👧', '🧑'];
-                const avatar = prompt(`Avatar :\n${avatars.join(' ')}`) || '👤';
-                ChronicleStorage.addMember(circle.id, { name: adminName, avatar, isAdmin: true });
-            }
-            renderCircles();
-        }
-
-        function addMember(circleId) {
-            const name = prompt('Nom du membre :');
-            if (!name) return;
-            const avatars = ['👨', '👩', '👦', '👧', '🧑', '👴', '👵'];
-            const avatar = prompt(`Avatar :\n${avatars.join(' ')}`) || '👤';
-            const isAdmin = confirm('Admin ?');
-            ChronicleStorage.addMember(circleId, { name, avatar, isAdmin });
-            renderCircles();
-        }
-
+        
+        // DÉMARRAGE
         document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Page chargée');
-            console.log('✅ Storage disponible:', typeof ChronicleStorage);
-            
-            createStars();
-            
-            const circles = ChronicleStorage.getCircles();
-            console.log('📊 Cercles existants:', circles.length);
-            
-            if (circles.length === 0) {
-                console.log('➕ Création du cercle par défaut...');
-                const family = ChronicleStorage.addCircle({ name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D4AF37' });
-                console.log('✅ Cercle créé:', family);
-                const member = ChronicleStorage.addMember(family.id, { name: 'Moi', avatar: '👤', isAdmin: true });
-                console.log('✅ Membre créé:', member);
-            }
-            
-            renderCircles();
+            render();
         });
     </script>
 </body>
