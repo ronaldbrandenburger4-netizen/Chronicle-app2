@@ -13,6 +13,36 @@
         .circle-wrapper { position: relative; width: 400px; height: 400px; display: flex; align-items: center; justify-content: center; }
         .circle-halo { position: relative; width: 200px; height: 200px; cursor: pointer; opacity: 0; animation: haloAppear 1s ease forwards; z-index: 10; }
         @keyframes haloAppear { from { opacity: 0; transform: scale(0.5) rotate(-180deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
+        
+        /* AJOUT CRITIQUE : Style pour halo-core */
+        .halo-core {
+            position: relative;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, rgba(255, 215, 0, 0.15) 30%, rgba(212, 175, 55, 0.1) 60%, transparent 100%);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.5), 0 0 100px rgba(232, 197, 116, 0.3), inset 0 0 40px rgba(255, 215, 0, 0.15);
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            animation: halo-pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes halo-pulse {
+            0%, 100% {
+                box-shadow: 0 0 60px rgba(212, 175, 55, 0.5), 0 0 100px rgba(232, 197, 116, 0.3), inset 0 0 40px rgba(255, 215, 0, 0.15);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 90px rgba(212, 175, 55, 0.8), 0 0 140px rgba(232, 197, 116, 0.5), inset 0 0 60px rgba(255, 215, 0, 0.25);
+                transform: scale(1.03);
+            }
+        }
+        
         .circle-icon { font-size: 64px; margin-bottom: 12px; }
         .circle-name { font-size: 18px; font-weight: 700; text-transform: uppercase; }
         .circle-member-count { font-size: 12px; color: #E8C574; margin-top: 4px; }
@@ -25,7 +55,34 @@
         .add-member-btn { position: absolute; top: -25px; right: -25px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #4CAF50, #66BB6A); color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); opacity: 0; animation: memberAppear 0.6s ease 0.8s forwards; }
         .add-member-btn:hover { transform: scale(1.15) rotate(90deg); }
         .add-circle { border-style: dashed; }
-        @media (max-width: 768px) { .circles-container { gap: 80px; } .circle-wrapper { width: 300px; height: 300px; } .circle-halo { width: 160px; height: 160px; } }
+        
+        /* BOUTON RESET */
+        .reset-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .reset-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.6);
+        }
+        
+        @media (max-width: 768px) { 
+            .circles-container { gap: 80px; } 
+            .circle-wrapper { width: 300px; height: 300px; } 
+            .circle-halo { width: 160px; height: 160px; }
+        }
     </style>
 </head>
 <body>
@@ -40,9 +97,20 @@
         <h1 class="page-title">Vos Cercles</h1>
         <div class="circles-container" id="circlesContainer"></div>
     </main>
+    
+    <button class="reset-btn" onclick="resetApp()">🔄 RESET APP</button>
 
     <script src="js/storage.js"></script>
     <script>
+        // Fonction RESET
+        window.resetApp = function() {
+            if (confirm('⚠️ Réinitialiser l\'application ?\n\nToutes les données (cercles, membres, événements) seront SUPPRIMÉES !')) {
+                localStorage.clear();
+                alert('✅ Application réinitialisée !\n\nLa page va se recharger...');
+                location.reload();
+            }
+        };
+        
         function createStars() {
             const layer = document.getElementById('starsLayer');
             for (let i = 0; i < 50; i++) {
