@@ -34,13 +34,7 @@
             height: 100%;
             background: radial-gradient(circle at 20% 80%, rgba(45, 74, 110, 0.3) 0%, transparent 50%),
                         radial-gradient(circle at 80% 20%, rgba(26, 45, 71, 0.3) 0%, transparent 50%);
-            animation: atmosphere-shift 20s ease-in-out infinite;
             z-index: 1;
-        }
-
-        @keyframes atmosphere-shift {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.95; }
         }
 
         .stars-layer {
@@ -120,10 +114,69 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        /* TIMELINE */
+        /* EMPTY STATE (comme ton RTF) */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .calendar-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(26, 45, 71, 0.6);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .calendar-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: rgba(212, 175, 55, 0.3);
+            border-radius: 13px 13px 0 0;
+        }
+
+        .calendar-month {
+            font-size: 11px;
+            color: var(--color-primary);
+            font-weight: 600;
+            margin-top: 35px;
+            margin-bottom: 5px;
+        }
+
+        .calendar-day {
+            font-size: 32px;
+            font-weight: 700;
+            color: rgba(245, 245, 240, 0.4);
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .empty-subtitle {
+            font-size: 16px;
+            color: rgba(245, 245, 240, 0.6);
+        }
+
+        /* TIMELINE AVEC ÉVÉNEMENTS */
         .timeline-container {
             flex: 1;
             display: flex;
@@ -226,32 +279,15 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
-        /* EMPTY STATE */
-        .empty-state {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
+        .instructions {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(212, 175, 55, 0.6);
+            font-size: 13px;
             text-align: center;
-        }
-
-        .empty-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.6;
-        }
-
-        .empty-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .empty-subtitle {
-            font-size: 16px;
-            color: rgba(245, 245, 240, 0.6);
+            z-index: 5;
         }
 
         /* MODAL */
@@ -481,18 +517,6 @@
             to { opacity: 0; transform: translateX(100px); }
         }
 
-        .instructions {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(212, 175, 55, 0.6);
-            font-size: 13px;
-            text-align: center;
-            z-index: 5;
-        }
-
-        /* Scrollbars */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(13, 20, 37, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.5); border-radius: 4px; }
@@ -516,12 +540,7 @@
         <button class="add-btn" onclick="showAddEventModal()">+</button>
     </header>
 
-    <main class="main-content">
-        <div id="mainDisplay"></div>
-        <div class="timeline-line" id="timelineLine" style="display:none;"></div>
-        <div class="events-wrapper" id="eventsWrapper"></div>
-        <div class="instructions" id="instructions"></div>
-    </main>
+    <main class="main-content" id="mainContent"></main>
 
     <!-- MODAL AJOUT ÉVÉNEMENT -->
     <div class="modal-overlay" id="addEventModal" onclick="closeAddEventModal()">
@@ -568,7 +587,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Icône de l'événement</label>
-                    <div class="icon-selector" id="eventIconSelector">
+                    <div class="icon-selector">
                         <div class="icon-category">
                             <div class="category-title">🎉 CÉLÉBRATIONS</div>
                             <div class="category-icons">
@@ -672,15 +691,8 @@
         }
 
         function renderTimeline() {
-            console.log('📊 Rendu timeline - Circle:', currentCircleId, 'Member:', currentMemberId);
-            
+            const mainContent = document.getElementById('mainContent');
             const data = getData();
-            const wrapper = document.getElementById('eventsWrapper');
-            const mainDisplay = document.getElementById('mainDisplay');
-            const timelineLine = document.getElementById('timelineLine');
-            const instructions = document.getElementById('instructions');
-            
-            wrapper.innerHTML = '';
             
             let events = data.events || [];
             
@@ -691,44 +703,43 @@
                 events = events.filter(e => e.memberId === currentMemberId);
             }
             
-            console.log(`📅 ${events.length} événements trouvés`);
-            
             if (events.length === 0) {
-                mainDisplay.innerHTML = `
+                // ÉTAT VIDE (comme ton RTF)
+                mainContent.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">📅</div>
+                        <div class="calendar-icon">
+                            <div class="calendar-header"></div>
+                            <div class="calendar-month">JUL</div>
+                            <div class="calendar-day">17</div>
+                        </div>
                         <div class="empty-title">Aucun événement</div>
                         <div class="empty-subtitle">Cliquez sur + pour ajouter un événement</div>
                     </div>
                 `;
-                timelineLine.style.display = 'none';
-                instructions.style.display = 'none';
-                return;
-            }
-            
-            mainDisplay.innerHTML = '';
-            timelineLine.style.display = 'block';
-            instructions.textContent = 'Cliquez sur un événement pour voir les souvenirs';
-            instructions.style.display = 'block';
-            
-            events.sort((a, b) => (a.year || 0) - (b.year || 0));
-            
-            events.forEach(event => {
-                const bubble = document.createElement('div');
-                bubble.className = 'event-bubble';
-                bubble.onclick = () => console.log('Event clicked:', event.id);
+            } else {
+                // TIMELINE AVEC ÉVÉNEMENTS
+                events.sort((a, b) => (a.year || 0) - (b.year || 0));
                 
-                const memoryCount = (event.memories || []).length;
+                let eventsHTML = '';
+                events.forEach(event => {
+                    const memoryCount = (event.memories || []).length;
+                    eventsHTML += `
+                        <div class="event-bubble" onclick="console.log('Event:', '${event.id}')">
+                            <div class="event-icon">${event.icon}</div>
+                            <div class="event-year">${event.year || new Date().getFullYear()}</div>
+                            ${memoryCount > 0 ? `<div class="memory-count-badge">${memoryCount}</div>` : ''}
+                            <div class="event-title-tooltip">${event.title}</div>
+                        </div>
+                    `;
+                });
                 
-                bubble.innerHTML = `
-                    <div class="event-icon">${event.icon}</div>
-                    <div class="event-year">${event.year || new Date().getFullYear()}</div>
-                    ${memoryCount > 0 ? `<div class="memory-count-badge">${memoryCount}</div>` : ''}
-                    <div class="event-title-tooltip">${event.title}</div>
+                mainContent.innerHTML = `
+                    <div class="timeline-container"></div>
+                    <div class="timeline-line"></div>
+                    <div class="events-wrapper">${eventsHTML}</div>
+                    <div class="instructions">Cliquez sur un événement pour voir les souvenirs</div>
                 `;
-                
-                wrapper.appendChild(bubble);
-            });
+            }
         }
 
         function showAddEventModal() {
@@ -736,10 +747,10 @@
             document.getElementById('addEventForm').reset();
             document.getElementById('eventYear').value = new Date().getFullYear();
             
-            document.querySelectorAll('#eventIconSelector .icon-option').forEach(opt => {
+            document.querySelectorAll('.icon-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
-            document.querySelector('#eventIconSelector .icon-option[data-icon="🎂"]').classList.add('selected');
+            document.querySelector('.icon-option[data-icon="🎂"]').classList.add('selected');
             selectedEventIcon = '🎂';
         }
 
@@ -749,7 +760,7 @@
 
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('icon-option')) {
-                document.querySelectorAll('#eventIconSelector .icon-option').forEach(opt => {
+                document.querySelectorAll('.icon-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 e.target.classList.add('selected');
@@ -789,8 +800,6 @@
                 memories: []
             };
             
-            console.log('✨ Création événement:', newEvent);
-            
             const data = getData();
             if (!data.events) data.events = [];
             data.events.push(newEvent);
@@ -825,10 +834,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('=== TIMELINE CHARGÉE ===');
-            console.log('Circle ID:', currentCircleId);
-            console.log('Member ID:', currentMemberId);
-            
             if (!currentCircleId && !currentMemberId) {
                 showNotification('⚠️ Aucun cercle ou membre sélectionné');
             }
