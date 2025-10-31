@@ -182,6 +182,7 @@
             align-items: center;
             justify-content: center;
             animation: halo-pulse 4s ease-in-out infinite;
+            pointer-events: none;
         }
 
         @keyframes halo-pulse {
@@ -441,6 +442,15 @@
         function createCircleHalo(circle) {
             const halo = document.createElement('div');
             halo.className = 'circle-halo';
+            
+            // ✅ CORRECTION : Ajouter le clic sur le halo AVANT de créer les enfants
+            halo.addEventListener('click', function(e) {
+                // Vérifier qu'on ne clique pas sur un membre
+                if (!e.target.closest('.member-avatar')) {
+                    console.log('🎯 Navigation vers timeline du cercle:', circle.id);
+                    window.location.href = `timeline.html?circleId=${circle.id}`;
+                }
+            });
 
             const ring1 = document.createElement('div');
             ring1.className = 'halo-ring ring-1';
@@ -473,10 +483,13 @@
                     ${member.avatar}
                     <div class="member-tooltip">${member.name}</div>
                 `;
-                avatar.onclick = (e) => {
-                    e.stopPropagation();
+                
+                // ✅ Navigation vers timeline du membre avec addEventListener
+                avatar.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Empêcher le clic du cercle
+                    console.log('👤 Navigation vers timeline du membre:', member.id);
                     window.location.href = `timeline.html?memberId=${member.id}`;
-                };
+                });
 
                 memberOrbit.appendChild(avatar);
                 membersContainer.appendChild(memberOrbit);
@@ -491,10 +504,11 @@
             const addMemberBtn = document.createElement('div');
             addMemberBtn.className = 'member-avatar add-member';
             addMemberBtn.innerHTML = `+<div class="member-tooltip">Ajouter</div>`;
-            addMemberBtn.onclick = (e) => {
+            
+            addMemberBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 alert('Ajouter un membre - Fonctionnalité à venir !');
-            };
+            });
 
             addMemberOrbit.appendChild(addMemberBtn);
             membersContainer.appendChild(addMemberOrbit);
@@ -510,7 +524,10 @@
         function createAddCircleHalo() {
             const halo = document.createElement('div');
             halo.className = 'circle-halo add-circle';
-            halo.onclick = () => alert('Nouveau cercle - Fonctionnalité à venir !');
+            
+            halo.addEventListener('click', function() {
+                alert('Nouveau cercle - Fonctionnalité à venir !');
+            });
 
             const ring1 = document.createElement('div');
             ring1.className = 'halo-ring ring-1';
