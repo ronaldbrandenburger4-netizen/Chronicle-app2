@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -13,31 +13,16 @@
             --color-bg-light: #2d4a6e;
             --color-text: #F5F5F0;
             --color-card-bg: rgba(30, 40, 60, 0.95);
-            --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-medium: 0 5px 20px rgba(0, 0, 0, 0.5);
-            --shadow-large: 0 10px 50px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 20px rgba(212, 175, 55, 0.4);
-            --transition-fast: 0.3s ease;
-            --transition-medium: 0.4s ease;
-            --transition-slow: 0.6s ease;
-            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --header-height: 70px;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(180deg, var(--color-bg-light) 0%, var(--color-bg-medium) 50%, var(--color-bg-dark) 100%);
-            height: 100vh;
+            background: linear-gradient(180deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 50%, var(--color-bg-light) 100%);
+            min-height: 100vh;
             color: var(--color-text);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
         }
 
         .atmospheric-bg {
@@ -46,9 +31,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(45, 74, 110, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(26, 45, 71, 0.3) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, rgba(45, 74, 110, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(26, 45, 71, 0.3) 0%, transparent 50%);
             animation: atmosphere-shift 20s ease-in-out infinite;
             z-index: 1;
         }
@@ -81,6 +65,10 @@
         }
 
         .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             padding: 15px 20px;
             background: rgba(13, 20, 37, 0.95);
             backdrop-filter: blur(10px);
@@ -88,37 +76,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: var(--header-height);
+            height: 70px;
             z-index: 1001;
-            position: relative;
         }
 
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(212, 175, 55, 0.2);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            color: var(--color-primary-light);
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #E8C574 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
             cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(212, 175, 55, 0.3);
-            transform: scale(1.1);
-        }
-
-        .member-info {
-            flex: 1;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
         }
 
         .add-btn {
@@ -129,415 +98,294 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             color: var(--color-bg-dark);
             cursor: pointer;
-            transition: all 0.3s var(--transition-bounce);
+            transition: all 0.3s ease;
             font-weight: bold;
-            box-shadow: var(--shadow-small);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
             border: none;
         }
 
         .add-btn:hover {
             transform: scale(1.15);
-            box-shadow: var(--shadow-glow);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6);
         }
 
-        .timeline-container {
-            flex: 1;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 20px;
-            padding-bottom: 100px;
-            overflow: hidden;
+        .main-content {
             position: relative;
-        }
-
-        .timeline-line {
-            position: fixed;
-            bottom: 150px;
-            left: 5%;
-            right: 5%;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.8) 50%, rgba(212, 175, 55, 0.2) 100%);
-            z-index: 5;
-        }
-
-        .events-wrapper {
-            position: fixed;
-            bottom: 110px;
-            left: 5%;
-            right: 5%;
-            height: 100px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
             z-index: 10;
+            padding-top: 70px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .event-bubble {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(232, 197, 116, 0.2) 100%);
-            border: 2px solid var(--color-primary);
-            border-radius: 50%;
+        .empty-state {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-            position: relative;
+            padding: 60px 20px;
+            text-align: center;
         }
 
-        .event-bubble:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.6;
         }
 
-        .event-icon {
-            font-size: 32px;
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
-        .event-year {
-            color: var(--color-primary);
-            font-size: 10px;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-
-        .event-title {
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(13, 20, 37, 0.95);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            white-space: nowrap;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .event-bubble:hover .event-title {
-            opacity: 1;
-        }
-
-        .memory-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-            color: var(--color-bg-dark);
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .add-memory-btn {
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
-            color: white;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .empty-subtitle {
             font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
+            color: rgba(245, 245, 240, 0.6);
         }
 
-        .add-memory-btn:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+        /* CATEGORIES D'ICONES */
+        .icon-category {
+            margin-bottom: 20px;
         }
 
-        .event-bubble.new {
-            animation: bounceIn 0.5s ease;
+        .category-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-left: 5px;
         }
 
-        @keyframes bounceIn {
-            0% { opacity: 0; transform: scale(0); }
-            50% { transform: scale(1.15); }
-            100% { opacity: 1; transform: scale(1); }
+        .category-icons {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
         }
 
-        .event-overlay {
+        /* MODAL */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            z-index: 30;
+            background: rgba(10, 14, 26, 0.92);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
             display: none;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .event-overlay.visible {
-            display: block;
+        .modal-overlay.active {
+            display: flex;
             opacity: 1;
         }
 
-        .event-center-container {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            z-index: 500;
-            pointer-events: none;
-            display: none;
+        .modal-content {
+            background: var(--color-bg-medium);
+            border: 2px solid var(--color-primary);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .event-center-container.visible {
-            display: block;
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
         }
 
-        .event-bubble.active {
-            position: absolute !important;
-            left: 50% !important;
-            top: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            width: 160px;
-            height: 160px;
-            box-shadow: 0 0 80px rgba(212, 175, 55, 1);
-            transition: all 0.5s var(--transition-bounce);
-            animation: pulseCenter 2s ease-in-out infinite;
-            border-width: 4px;
-            pointer-events: all;
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
-        @keyframes pulseCenter {
-            0%, 100% {
-                box-shadow: 0 0 80px rgba(212, 175, 55, 0.9);
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                box-shadow: 0 0 100px rgba(212, 175, 55, 1);
-                transform: translate(-50%, -50%) scale(1.05);
-            }
-        }
-
-        .event-bubble.active .event-icon {
-            font-size: 70px;
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
-        }
-
-        .event-bubble.active .event-year {
-            font-size: 16px;
+        .modal-title {
+            font-size: 26px;
             font-weight: 700;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
-        .event-bubble.active .event-title {
-            display: none;
-        }
-
-        .event-bubble.active .memory-count {
-            top: 8px;
-            right: 8px;
-            width: 35px;
-            height: 35px;
-            font-size: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-        }
-
-        .event-bubble.active .add-memory-btn {
-            top: 8px;
-            left: 8px;
-            width: 35px;
-            height: 35px;
-            font-size: 20px;
-        }
-
-        .event-label {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            z-index: 502;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .event-label.visible {
-            opacity: 1;
-        }
-
-        .event-label-title {
+        .modal-close {
             font-size: 32px;
-            font-weight: bold;
-            color: var(--color-text);
-            margin-bottom: 8px;
-            text-shadow: 0 3px 15px rgba(0,0,0,0.7);
+            color: var(--color-primary-light);
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--color-primary);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
             letter-spacing: 0.5px;
         }
 
-        .event-label-date {
-            font-size: 18px;
-            color: var(--color-primary);
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-        }
-
-        .memory-orbit {
-            position: fixed;
-            width: 110px;
-            transition: all 0.5s var(--transition-bounce);
-            opacity: 0;
-            transform: scale(0) rotate(-180deg);
-            z-index: 40;
-        }
-
-        .memory-orbit.visible {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
-
-        .memory-orbit.closing {
-            opacity: 0;
-            transform: scale(0) rotate(180deg);
-            transition: all 0.4s ease;
-        }
-
-        .memory-card {
+        .form-input {
             width: 100%;
-            background: rgba(26, 45, 71, 0.98);
-            border: 2px solid rgba(212, 175, 55, 0.5);
+            padding: 14px 18px;
+            background: rgba(13, 20, 37, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 12px;
-            padding: 12px;
-            cursor: pointer;
+            color: var(--color-text);
+            font-size: 15px;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-medium);
+            font-family: inherit;
         }
 
-        .memory-card:hover {
-            transform: scale(1.15) translateY(-5px);
+        .form-input:focus {
+            outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 10px 35px rgba(212, 175, 55, 0.5);
-            z-index: 50;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
 
-        .memory-thumb {
+        .form-input::placeholder {
+            color: rgba(245, 245, 240, 0.5);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .icon-selector {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(13, 20, 37, 0.5);
+            border-radius: 12px;
+        }
+
+        .icon-option {
             width: 100%;
-            height: 65px;
-            background: linear-gradient(135deg, #3d4e60 0%, #4d5e70 100%);
-            border-radius: 8px;
+            aspect-ratio: 1;
+            background: rgba(26, 45, 71, 0.6);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            margin-bottom: 8px;
-            transition: transform 0.3s ease;
-            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .memory-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .memory-card:hover .memory-thumb {
+        .icon-option:hover {
+            border-color: var(--color-primary-light);
+            background: rgba(212, 175, 55, 0.15);
             transform: scale(1.1);
         }
 
-        .memory-title {
-            font-size: 12px;
+        .icon-option.selected {
+            border-color: var(--color-primary);
+            background: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color: var(--color-bg-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(212, 175, 55, 0.15);
             color: var(--color-text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 3px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
-        .memory-card:hover .memory-title {
-            color: var(--color-primary);
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.25);
         }
 
-        .memory-type {
-            color: var(--color-primary);
-            font-size: 10px;
-        }
-
-        .connection-line {
+        .notification {
             position: fixed;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.6) 50%, rgba(212, 175, 55, 0) 100%);
-            transform-origin: left center;
-            pointer-events: none;
-            opacity: 0;
-            transition: all 0.5s ease;
-            z-index: 35;
+            top: 90px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color: var(--color-bg-dark);
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+            z-index: 3000;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
         }
 
-        .connection-line.visible {
-            opacity: 1;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        .connection-line.closing {
-            opacity: 0;
-            transform: scaleX(0);
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100px); }
         }
 
-        .empty-message {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(245, 245, 240, 0.7);
-        }
-
-        .instructions {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(212, 175, 55, 0.6);
-            font-size: 13px;
-            text-align: center;
-            z-index: 5;
-        }
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(13, 20, 37, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.8); }
 
         @media (max-width: 768px) {
-            .member-info {
-                font-size: 16px;
-            }
-
-            .event-bubble {
-                width: 60px;
-                height: 60px;
-            }
-
-            .event-icon {
-                font-size: 28px;
-            }
-
-            .memory-orbit {
-                width: 90px;
-            }
+            .modal-content { padding: 30px 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .category-icons { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
@@ -546,35 +394,148 @@
     <div class="stars-layer" id="starsLayer"></div>
 
     <header class="header">
-        <a href="cercles.html" class="back-btn">←</a>
-        <div class="member-info" id="memberInfo">Timeline</div>
-        <button class="add-btn" id="addBtn" onclick="showAddEventModal()">+</button>
+        <div class="logo" onclick="window.location.href='cercles.html'">Chronicle</div>
+        <button class="add-btn" onclick="showAddEventModal()">+</button>
     </header>
 
-    <main class="timeline-container">
-        <div class="timeline-line"></div>
-        <div class="events-wrapper" id="eventsWrapper"></div>
+    <main class="main-content">
+        <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <div class="empty-title">Aucun événement</div>
+            <div class="empty-subtitle">Cliquez sur + pour ajouter un événement</div>
+        </div>
     </main>
 
-    <div class="event-overlay" id="eventOverlay" onclick="closeEvent()"></div>
-    <div class="event-label" id="eventLabel">
-        <div class="event-label-title" id="eventLabelTitle"></div>
-        <div class="event-label-date" id="eventLabelDate"></div>
-    </div>
-    <div class="event-center-container" id="eventCenterContainer"></div>
-    <div id="memoriesContainer"></div>
-    <div id="connectionsContainer"></div>
+    <!-- MODAL AJOUT ÉVÉNEMENT -->
+    <div class="modal-overlay" id="addEventModal" onclick="closeAddEventModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">Ajouter un événement</h2>
+                <span class="modal-close" onclick="closeAddEventModal()">×</span>
+            </div>
 
-    <div class="instructions">Cliquez sur un événement pour voir les souvenirs</div>
+            <form id="addEventForm" onsubmit="handleAddEvent(event)">
+                <div class="form-group">
+                    <label class="form-label">Titre de l'événement</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="eventTitle" 
+                        placeholder="Ex: Mariage, Naissance, Diplôme..."
+                        required
+                    >
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Année</label>
+                        <input 
+                            type="number" 
+                            class="form-input" 
+                            id="eventYear" 
+                            placeholder="2024"
+                            min="1900"
+                            max="2100"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date complète (optionnelle)</label>
+                        <input 
+                            type="date" 
+                            class="form-input" 
+                            id="eventDate"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Icône de l'événement</label>
+                    <div class="icon-selector" id="eventIconSelector">
+                        <!-- CÉLÉBRATIONS -->
+                        <div class="icon-category">
+                            <div class="category-title">🎉 CÉLÉBRATIONS</div>
+                            <div class="category-icons">
+                                <div class="icon-option selected" data-icon="🎂">🎂</div>
+                                <div class="icon-option" data-icon="👰">👰</div>
+                                <div class="icon-option" data-icon="🎓">🎓</div>
+                                <div class="icon-option" data-icon="🎉">🎉</div>
+                                <div class="icon-option" data-icon="💍">💍</div>
+                                <div class="icon-option" data-icon="🎊">🎊</div>
+                            </div>
+                        </div>
+
+                        <!-- FAMILLE -->
+                        <div class="icon-category">
+                            <div class="category-title">👨‍👩‍👧‍👦 FAMILLE</div>
+                            <div class="category-icons">
+                                <div class="icon-option" data-icon="👶">👶</div>
+                                <div class="icon-option" data-icon="🤱">🤱</div>
+                                <div class="icon-option" data-icon="👨‍👩‍👧‍👦">👨‍👩‍👧‍👦</div>
+                                <div class="icon-option" data-icon="❤️">❤️</div>
+                                <div class="icon-option" data-icon="🏡">🏡</div>
+                                <div class="icon-option" data-icon="🐶">🐶</div>
+                            </div>
+                        </div>
+
+                        <!-- VOYAGES -->
+                        <div class="icon-category">
+                            <div class="category-title">✈️ VOYAGES</div>
+                            <div class="category-icons">
+                                <div class="icon-option" data-icon="✈️">✈️</div>
+                                <div class="icon-option" data-icon="🏖️">🏖️</div>
+                                <div class="icon-option" data-icon="🗼">🗼</div>
+                                <div class="icon-option" data-icon="🚗">🚗</div>
+                                <div class="icon-option" data-icon="⛰️">⛰️</div>
+                                <div class="icon-option" data-icon="🏕️">🏕️</div>
+                            </div>
+                        </div>
+
+                        <!-- CARRIÈRE -->
+                        <div class="icon-category">
+                            <div class="category-title">💼 CARRIÈRE</div>
+                            <div class="category-icons">
+                                <div class="icon-option" data-icon="💼">💼</div>
+                                <div class="icon-option" data-icon="🏆">🏆</div>
+                                <div class="icon-option" data-icon="📈">📈</div>
+                                <div class="icon-option" data-icon="🎯">🎯</div>
+                                <div class="icon-option" data-icon="💡">💡</div>
+                                <div class="icon-option" data-icon="🚀">🚀</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description (optionnelle)</label>
+                    <textarea 
+                        class="form-input form-textarea" 
+                        id="eventDescription" 
+                        placeholder="Quelques mots sur cet événement..."
+                        rows="3"
+                    ></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddEventModal()">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Créer l'événement
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         const STORAGE_KEY = 'chronicle_data';
-        let activeEventId = null;
-        let currentMemberId = new URLSearchParams(window.location.search).get('memberId');
+        let selectedEventIcon = '🎂';
+        let currentCircleId = new URLSearchParams(window.location.search).get('circleId');
 
         function getData() {
             const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : { circles: [], members: [], events: [], memories: [] };
+            return data ? JSON.parse(data) : { circles: [], members: [], events: [] };
         }
 
         function saveData(data) {
@@ -596,207 +557,101 @@
             }
         }
 
-        function renderTimeline() {
-            const wrapper = document.getElementById('eventsWrapper');
-            wrapper.innerHTML = '';
-            const data = getData();
-            
-            let events = data.events || [];
-            if (currentMemberId) {
-                events = events.filter(e => e.memberId === currentMemberId);
-                const member = data.members.find(m => m.id === currentMemberId);
-                if (member) {
-                    document.getElementById('memberInfo').textContent = `${member.avatar} ${member.name} - Timeline`;
-                }
-            }
-
-            if (events.length === 0) {
-                wrapper.innerHTML = `
-                    <div class="empty-message">
-                        <div style="font-size: 64px; margin-bottom: 20px;">📅</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Aucun événement</div>
-                        <div style="font-size: 14px;">Cliquez sur + pour ajouter votre premier événement</div>
-                    </div>
-                `;
-                return;
-            }
-
-            events.sort((a, b) => (a.year || 0) - (b.year || 0));
-
-            events.forEach(event => {
-                const bubble = document.createElement('div');
-                bubble.className = 'event-bubble';
-                bubble.id = event.id;
-                bubble.onclick = () => toggleEvent(event.id);
-                
-                const memories = (event.memories || []).length;
-                
-                bubble.innerHTML = `
-                    <div class="event-icon">${event.icon}</div>
-                    <div class="event-year">${event.year || new Date().getFullYear()}</div>
-                    <div class="memory-count">${memories}</div>
-                    <div class="event-title">${event.title}</div>
-                `;
-                
-                wrapper.appendChild(bubble);
-            });
-        }
-
-        function toggleEvent(eventId) {
-            if (activeEventId === eventId) {
-                closeEvent();
-            } else {
-                if (activeEventId) closeEvent();
-                openEvent(eventId);
-            }
-        }
-
-        function openEvent(eventId) {
-            activeEventId = eventId;
-            const data = getData();
-            const event = data.events.find(e => e.id === eventId);
-            if (!event) return;
-
-            const bubble = document.getElementById(eventId);
-            const centerContainer = document.getElementById('eventCenterContainer');
-            
-            const bubbleClone = bubble.cloneNode(true);
-            bubbleClone.id = eventId + '-center';
-            bubbleClone.classList.add('active');
-            bubbleClone.onclick = null;
-            
-            centerContainer.innerHTML = '';
-            centerContainer.appendChild(bubbleClone);
-            centerContainer.classList.add('visible');
-            
-            bubble.style.opacity = '0';
-
-            document.getElementById('eventOverlay').classList.add('visible');
-            document.getElementById('eventLabelTitle').textContent = event.title;
-            document.getElementById('eventLabelDate').textContent = event.date || `Année ${event.year}`;
-            document.getElementById('eventLabel').classList.add('visible');
-
-            setTimeout(() => {
-                if (activeEventId === eventId) {
-                    createMemoriesOrbit(event, bubbleClone);
-                }
-            }, 300);
-        }
-
-        function closeEvent() {
-            if (!activeEventId) return;
-
-            const bubble = document.getElementById(activeEventId);
-            const centerContainer = document.getElementById('eventCenterContainer');
-            
-            if (bubble) {
-                bubble.style.opacity = '1';
-                bubble.classList.remove('active');
-            }
-            
-            centerContainer.classList.remove('visible');
-            setTimeout(() => {
-                centerContainer.innerHTML = '';
-            }, 300);
-
-            document.getElementById('eventOverlay').classList.remove('visible');
-            document.getElementById('eventLabel').classList.remove('visible');
-
-            const memories = document.querySelectorAll('.memory-orbit');
-            const lines = document.querySelectorAll('.connection-line');
-            
-            memories.forEach((mem, index) => {
-                mem.style.transitionDelay = (index * 0.03) + 's';
-                mem.classList.add('closing');
-            });
-            
-            lines.forEach((line, index) => {
-                line.style.transitionDelay = (index * 0.03) + 's';
-                line.classList.add('closing');
-            });
-
-            setTimeout(() => {
-                document.getElementById('memoriesContainer').innerHTML = '';
-                document.getElementById('connectionsContainer').innerHTML = '';
-            }, 500);
-
-            activeEventId = null;
-        }
-
-        function createMemoriesOrbit(event, bubble) {
-            const memoriesContainer = document.getElementById('memoriesContainer');
-            const connectionsContainer = document.getElementById('connectionsContainer');
-
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            const radius = Math.min(window.innerWidth, window.innerHeight) / 3;
-
-            const memories = event.memories || [];
-
-            memories.forEach((memory, index) => {
-                const angle = ((360 / memories.length) * index) + 45;
-                const radian = (angle - 90) * (Math.PI / 180);
-                const x = centerX + radius * Math.cos(radian);
-                const y = centerY + radius * Math.sin(radian);
-
-                const memoryDiv = document.createElement('div');
-                memoryDiv.className = 'memory-orbit';
-                memoryDiv.style.left = (x - 55) + 'px';
-                memoryDiv.style.top = (y - 55) + 'px';
-                memoryDiv.style.transitionDelay = (index * 0.06) + 's';
-
-                const thumbContent = memory.thumbnail 
-                    ? `<img src="${memory.thumbnail}" alt="${memory.title}">`
-                    : memory.icon || '📝';
-
-                memoryDiv.innerHTML = `
-                    <div class="memory-card">
-                        <div class="memory-thumb">${thumbContent}</div>
-                        <div class="memory-title">${memory.title}</div>
-                        <div class="memory-type">${memory.type || 'Souvenir'}</div>
-                    </div>
-                `;
-
-                memoriesContainer.appendChild(memoryDiv);
-
-                const line = document.createElement('div');
-                line.className = 'connection-line';
-                const lineLength = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-                const lineAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
-
-                line.style.width = lineLength + 'px';
-                line.style.left = centerX + 'px';
-                line.style.top = centerY + 'px';
-                line.style.transform = `rotate(${lineAngle}deg)`;
-                line.style.transitionDelay = (index * 0.06) + 's';
-
-                connectionsContainer.appendChild(line);
-
-                requestAnimationFrame(() => {
-                    memoryDiv.classList.add('visible');
-                    line.classList.add('visible');
-                });
-            });
-        }
-
         function showAddEventModal() {
-            alert('Fonctionnalité d\'ajout d\'événement à venir !');
+            document.getElementById('addEventModal').classList.add('active');
+            document.getElementById('addEventForm').reset();
+            document.getElementById('eventYear').value = new Date().getFullYear();
+            
+            document.querySelectorAll('#eventIconSelector .icon-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector('#eventIconSelector .icon-option[data-icon="🎂"]').classList.add('selected');
+            selectedEventIcon = '🎂';
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!currentMemberId) {
-                alert('Aucun membre sélectionné');
-                window.location.href = 'cercles.html';
+        function closeAddEventModal() {
+            document.getElementById('addEventModal').classList.remove('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('icon-option')) {
+                document.querySelectorAll('#eventIconSelector .icon-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+                selectedEventIcon = e.target.getAttribute('data-icon');
+            }
+        });
+
+        function handleAddEvent(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('eventTitle').value.trim();
+            const year = parseInt(document.getElementById('eventYear').value);
+            const dateInput = document.getElementById('eventDate').value;
+            const description = document.getElementById('eventDescription').value.trim();
+            
+            if (!title) {
+                showNotification('⚠️ Veuillez saisir un titre');
                 return;
             }
-            createStars();
-            renderTimeline();
-        });
+            
+            let dateStr = `Année ${year}`;
+            if (dateInput) {
+                const date = new Date(dateInput);
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                dateStr = date.toLocaleDateString('fr-FR', options);
+            }
+            
+            const newEvent = {
+                id: 'event_' + Date.now(),
+                circleId: currentCircleId,
+                title: title,
+                year: year,
+                date: dateStr,
+                icon: selectedEventIcon,
+                description: description,
+                memories: []
+            };
+            
+            const data = getData();
+            if (!data.events) data.events = [];
+            data.events.push(newEvent);
+            saveData(data);
+            
+            closeAddEventModal();
+            showNotification(`✨ Événement "${title}" créé !`);
+            
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+
+        function showNotification(message) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.remove();
+            }, 3000);
+        }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closeEvent();
+                closeAddEventModal();
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentCircleId) {
+                showNotification('⚠️ Aucun cercle sélectionné');
+            }
+            createStars();
         });
     </script>
 </body>
