@@ -12,7 +12,6 @@
             --color-bg-medium: #1a2d47;
             --color-bg-light: #2d4a6e;
             --color-text: #F5F5F0;
-            --color-card-bg: rgba(30, 40, 60, 0.95);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,9 +19,11 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(180deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 50%, var(--color-bg-light) 100%);
-            min-height: 100vh;
+            height: 100vh;
             color: var(--color-text);
-            overflow-x: hidden;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .atmospheric-bg {
@@ -116,11 +117,116 @@
             position: relative;
             z-index: 10;
             padding-top: 70px;
-            min-height: 100vh;
+            flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
+        /* TIMELINE */
+        .timeline-container {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 20px;
+            padding-bottom: 150px;
+            position: relative;
+        }
+
+        .timeline-line {
+            position: fixed;
+            bottom: 200px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.8) 50%, rgba(212, 175, 55, 0.2) 100%);
+            z-index: 5;
+        }
+
+        .events-wrapper {
+            position: fixed;
+            bottom: 160px;
+            left: 5%;
+            right: 5%;
+            height: 120px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .event-bubble {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(232, 197, 116, 0.2) 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            position: relative;
+        }
+
+        .event-bubble:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .event-icon {
+            font-size: 36px;
+            margin-bottom: 4px;
+        }
+
+        .event-year {
+            color: var(--color-primary);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .event-title-tooltip {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(13, 20, 37, 0.95);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .event-bubble:hover .event-title-tooltip {
+            opacity: 1;
+        }
+
+        .memory-count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            color: var(--color-bg-dark);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* EMPTY STATE */
         .empty-state {
             flex: 1;
             display: flex;
@@ -146,27 +252,6 @@
         .empty-subtitle {
             font-size: 16px;
             color: rgba(245, 245, 240, 0.6);
-        }
-
-        /* CATEGORIES D'ICONES */
-        .icon-category {
-            margin-bottom: 20px;
-        }
-
-        .category-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--color-primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            padding-left: 5px;
-        }
-
-        .category-icons {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
         }
 
         /* MODAL */
@@ -287,6 +372,26 @@
             border-radius: 12px;
         }
 
+        .icon-category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        .category-icons {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
         .icon-option {
             width: 100%;
             aspect-ratio: 1;
@@ -376,6 +481,17 @@
             to { opacity: 0; transform: translateX(100px); }
         }
 
+        .instructions {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(212, 175, 55, 0.6);
+            font-size: 13px;
+            text-align: center;
+            z-index: 5;
+        }
+
         /* Scrollbars */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(13, 20, 37, 0.5); }
@@ -386,6 +502,8 @@
             .modal-content { padding: 30px 20px; }
             .form-row { grid-template-columns: 1fr; }
             .category-icons { grid-template-columns: repeat(4, 1fr); }
+            .event-bubble { width: 65px; height: 65px; }
+            .event-icon { font-size: 28px; }
         }
     </style>
 </head>
@@ -399,11 +517,10 @@
     </header>
 
     <main class="main-content">
-        <div class="empty-state">
-            <div class="empty-icon">📅</div>
-            <div class="empty-title">Aucun événement</div>
-            <div class="empty-subtitle">Cliquez sur + pour ajouter un événement</div>
-        </div>
+        <div id="mainDisplay"></div>
+        <div class="timeline-line" id="timelineLine" style="display:none;"></div>
+        <div class="events-wrapper" id="eventsWrapper"></div>
+        <div class="instructions" id="instructions"></div>
     </main>
 
     <!-- MODAL AJOUT ÉVÉNEMENT -->
@@ -452,7 +569,6 @@
                 <div class="form-group">
                     <label class="form-label">Icône de l'événement</label>
                     <div class="icon-selector" id="eventIconSelector">
-                        <!-- CÉLÉBRATIONS -->
                         <div class="icon-category">
                             <div class="category-title">🎉 CÉLÉBRATIONS</div>
                             <div class="category-icons">
@@ -465,7 +581,6 @@
                             </div>
                         </div>
 
-                        <!-- FAMILLE -->
                         <div class="icon-category">
                             <div class="category-title">👨‍👩‍👧‍👦 FAMILLE</div>
                             <div class="category-icons">
@@ -478,7 +593,6 @@
                             </div>
                         </div>
 
-                        <!-- VOYAGES -->
                         <div class="icon-category">
                             <div class="category-title">✈️ VOYAGES</div>
                             <div class="category-icons">
@@ -491,7 +605,6 @@
                             </div>
                         </div>
 
-                        <!-- CARRIÈRE -->
                         <div class="icon-category">
                             <div class="category-title">💼 CARRIÈRE</div>
                             <div class="category-icons">
@@ -532,6 +645,7 @@
         const STORAGE_KEY = 'chronicle_data';
         let selectedEventIcon = '🎂';
         let currentCircleId = new URLSearchParams(window.location.search).get('circleId');
+        let currentMemberId = new URLSearchParams(window.location.search).get('memberId');
 
         function getData() {
             const data = localStorage.getItem(STORAGE_KEY);
@@ -555,6 +669,66 @@
                 star.style.height = size + 'px';
                 layer.appendChild(star);
             }
+        }
+
+        function renderTimeline() {
+            console.log('📊 Rendu timeline - Circle:', currentCircleId, 'Member:', currentMemberId);
+            
+            const data = getData();
+            const wrapper = document.getElementById('eventsWrapper');
+            const mainDisplay = document.getElementById('mainDisplay');
+            const timelineLine = document.getElementById('timelineLine');
+            const instructions = document.getElementById('instructions');
+            
+            wrapper.innerHTML = '';
+            
+            let events = data.events || [];
+            
+            if (currentCircleId) {
+                events = events.filter(e => e.circleId === currentCircleId);
+            }
+            if (currentMemberId) {
+                events = events.filter(e => e.memberId === currentMemberId);
+            }
+            
+            console.log(`📅 ${events.length} événements trouvés`);
+            
+            if (events.length === 0) {
+                mainDisplay.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <div class="empty-title">Aucun événement</div>
+                        <div class="empty-subtitle">Cliquez sur + pour ajouter un événement</div>
+                    </div>
+                `;
+                timelineLine.style.display = 'none';
+                instructions.style.display = 'none';
+                return;
+            }
+            
+            mainDisplay.innerHTML = '';
+            timelineLine.style.display = 'block';
+            instructions.textContent = 'Cliquez sur un événement pour voir les souvenirs';
+            instructions.style.display = 'block';
+            
+            events.sort((a, b) => (a.year || 0) - (b.year || 0));
+            
+            events.forEach(event => {
+                const bubble = document.createElement('div');
+                bubble.className = 'event-bubble';
+                bubble.onclick = () => console.log('Event clicked:', event.id);
+                
+                const memoryCount = (event.memories || []).length;
+                
+                bubble.innerHTML = `
+                    <div class="event-icon">${event.icon}</div>
+                    <div class="event-year">${event.year || new Date().getFullYear()}</div>
+                    ${memoryCount > 0 ? `<div class="memory-count-badge">${memoryCount}</div>` : ''}
+                    <div class="event-title-tooltip">${event.title}</div>
+                `;
+                
+                wrapper.appendChild(bubble);
+            });
         }
 
         function showAddEventModal() {
@@ -606,6 +780,7 @@
             const newEvent = {
                 id: 'event_' + Date.now(),
                 circleId: currentCircleId,
+                memberId: currentMemberId,
                 title: title,
                 year: year,
                 date: dateStr,
@@ -613,6 +788,8 @@
                 description: description,
                 memories: []
             };
+            
+            console.log('✨ Création événement:', newEvent);
             
             const data = getData();
             if (!data.events) data.events = [];
@@ -623,8 +800,8 @@
             showNotification(`✨ Événement "${title}" créé !`);
             
             setTimeout(() => {
-                location.reload();
-            }, 1000);
+                renderTimeline();
+            }, 500);
         }
 
         function showNotification(message) {
@@ -648,10 +825,16 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!currentCircleId) {
-                showNotification('⚠️ Aucun cercle sélectionné');
+            console.log('=== TIMELINE CHARGÉE ===');
+            console.log('Circle ID:', currentCircleId);
+            console.log('Member ID:', currentMemberId);
+            
+            if (!currentCircleId && !currentMemberId) {
+                showNotification('⚠️ Aucun cercle ou membre sélectionné');
             }
+            
             createStars();
+            renderTimeline();
         });
     </script>
 </body>
